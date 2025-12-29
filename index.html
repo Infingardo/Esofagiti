@@ -100,11 +100,88 @@
         }
         
         input[type="number"] {
-            width: 120px;
+            width: 100px;
             padding: 10px;
             border: 1px solid var(--border);
             border-radius: 6px;
             font-size: 1em;
+            text-align: center;
+        }
+        
+        input[type="number"]::placeholder {
+            color: #a0aec0;
+        }
+        
+        .eos-levels {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .eos-level-item {
+            background: var(--bg);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .eos-level-item label {
+            display: block;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        .eos-input-group {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .eos-unit {
+            font-size: 0.85em;
+            color: #718096;
+        }
+        
+        .peak-display {
+            background: #edf2f7;
+            padding: 12px 20px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .peak-label {
+            font-weight: 600;
+            color: var(--secondary);
+        }
+        
+        .peak-value {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .peak-value.above-threshold {
+            color: var(--success);
+        }
+        
+        .peak-value.below-threshold {
+            color: var(--warning);
+        }
+        
+        .peak-unit {
+            color: #718096;
+        }
+        
+        .peak-location {
+            font-size: 0.85em;
+            color: #718096;
+            font-style: italic;
         }
         
         .checkbox-group {
@@ -229,6 +306,15 @@
             font-size: 1.2em;
             font-weight: 700;
             margin-bottom: 8px;
+        }
+        
+        .diagnosis-ref {
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px dashed rgba(0,0,0,0.2);
+            font-size: 0.8em;
+            color: #555;
+            font-style: italic;
         }
         
         .features-summary {
@@ -390,6 +476,49 @@
             padding-top: 15px;
             border-top: 1px solid var(--border);
         }
+        
+        .info-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.75em;
+            font-weight: bold;
+            cursor: help;
+            margin-left: 8px;
+        }
+        
+        .info-icon:hover {
+            background: var(--primary);
+        }
+        
+        .hss-explanation {
+            background: #e6fffa;
+            border-left: 3px solid #38b2ac;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.9em;
+        }
+        
+        .hss-explanation p {
+            margin: 4px 0;
+        }
+        
+        .optional-badge {
+            background: #718096;
+            color: white;
+            font-size: 0.6em;
+            padding: 3px 8px;
+            border-radius: 4px;
+            margin-left: 10px;
+            font-weight: 600;
+            vertical-align: middle;
+        }
     </style>
 </head>
 <body>
@@ -403,25 +532,53 @@
         <div class="section">
             <h2 class="section-title">
                 <span class="step-number">1</span>
-                Conta Eosinofili (Peak Eosinophil Count)
+                Conta Eosinofili (per livello esofageo)
             </h2>
             
-            <div class="input-group">
-                <label for="peakEos">Numero massimo di eosinofili per HPF (0.24 mm²):</label>
-                <input type="number" id="peakEos" min="0" max="500" value="0">
+            <div class="eos-levels">
+                <div class="eos-level-item">
+                    <label for="eosProximal">Esofago prossimale</label>
+                    <div class="eos-input-group">
+                        <input type="number" id="eosProximal" min="0" max="500" placeholder="—">
+                        <span class="eos-unit">eos/HPF</span>
+                    </div>
+                </div>
+                
+                <div class="eos-level-item">
+                    <label for="eosMid">Esofago medio</label>
+                    <div class="eos-input-group">
+                        <input type="number" id="eosMid" min="0" max="500" placeholder="—">
+                        <span class="eos-unit">eos/HPF</span>
+                    </div>
+                </div>
+                
+                <div class="eos-level-item">
+                    <label for="eosDistal">Esofago distale</label>
+                    <div class="eos-input-group">
+                        <input type="number" id="eosDistal" min="0" max="500" placeholder="—">
+                        <span class="eos-unit">eos/HPF</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="peak-display" id="peakDisplay">
+                <span class="peak-label">Peak eosinophil count:</span>
+                <span class="peak-value" id="peakValue">—</span>
+                <span class="peak-unit">eos/HPF</span>
+                <span class="peak-location" id="peakLocation"></span>
             </div>
             
             <div class="info-note">
-                <strong>Nota tecnica:</strong> Contare il campo HPF con il maggior numero di eosinofili intraepiteliali. 
-                Il cut-off diagnostico è ≥15 eos/HPF. Ricordare che la malattia è patchy: valutare almeno 6 biopsie da 2 livelli esofagei.
+                <strong>Nota:</strong> Inserire il valore massimo per ciascun livello campionato. Lasciare vuoto se non campionato.
+                Cut-off diagnostico: ≥15 eos/HPF. Campo standard: 0.24 mm².
             </div>
         </div>
 
-        <!-- STEP 2: Features istologiche accessorie -->
+        <!-- STEP 2: Aspetti istologici peculiari -->
         <div class="section">
             <h2 class="section-title">
                 <span class="step-number">2</span>
-                Features Istologiche Accessorie
+                Aspetti Istologici Peculiari
             </h2>
             
             <div class="checkbox-group">
@@ -571,7 +728,7 @@
                     <span>Solo distale</span>
                 </label>
                 <label class="radio-item">
-                    <input type="radio" name="distribution" value="diffuse" id="distDiffuse" checked>
+                    <input type="radio" name="distribution" value="diffuse" id="distDiffuse">
                     <span>Diffusa (prox + dist)</span>
                 </label>
                 <label class="radio-item">
@@ -590,13 +747,21 @@
         <div class="section">
             <h2 class="section-title">
                 <span class="step-number">5</span>
-                EoE Histologic Scoring System (Collins) - Opzionale
+                EoE Histologic Scoring System (Collins)
+                <span class="optional-badge">FACOLTATIVO</span>
             </h2>
             
+            <div class="hss-explanation">
+                <p>⚠️ <strong>Non necessario per la diagnosi.</strong> L'HSS è uno scoring validato utile per follow-up e trial clinici.</p>
+                <p style="margin-top: 8px; font-size: 0.9em; color: #666;">
+                    <strong>Grade</strong> = severità massima | <strong>Stage</strong> = estensione nel tessuto
+                </p>
+            </div>
+            
             <div class="tabs">
-                <button class="tab active" onclick="switchTab('skip')">Salta HSS</button>
-                <button class="tab" onclick="switchTab('grade')">Compila Grade</button>
-                <button class="tab" onclick="switchTab('stage')">Compila Stage</button>
+                <button type="button" class="tab active" onclick="switchTab('skip')">Salta (default)</button>
+                <button type="button" class="tab" onclick="switchTab('grade')">Compila Grade</button>
+                <button type="button" class="tab" onclick="switchTab('stage')">Compila Stage</button>
             </div>
             
             <div id="tab-skip" class="tab-content active">
@@ -760,7 +925,7 @@
             </div>
         </div>
 
-        <button onclick="evaluate()">📋 Genera Valutazione Diagnostica</button>
+        <button type="button" onclick="generateDiagnosis()">📋 Genera Valutazione Diagnostica</button>
 
         <!-- RISULTATI -->
         <div id="result" class="result">
@@ -770,10 +935,11 @@
                 <div id="diagnosisBox" class="diagnosis-box">
                     <div id="diagnosisTitle" class="diagnosis-title"></div>
                     <div id="diagnosisText"></div>
+                    <div id="diagnosisRef" class="diagnosis-ref"></div>
                 </div>
                 
                 <div id="featuresSummary" class="features-summary">
-                    <h4>Riepilogo Features Istologiche</h4>
+                    <h4>Riepilogo Aspetti Istologici</h4>
                     <ul id="featuresList" class="feature-list"></ul>
                 </div>
                 
@@ -789,7 +955,7 @@
                 
                 <h4 style="margin-top: 20px; color: var(--primary);">Suggerimento Referto</h4>
                 <div id="reportText" class="report-text"></div>
-                <button class="copy-btn" onclick="copyReport()">📋 Copia Referto</button>
+                <button type="button" class="copy-btn" onclick="copyReport()">📋 Copia Referto</button>
             </div>
         </div>
 
@@ -835,17 +1001,72 @@
     <script>
         let activeHssTab = 'skip';
         
+        // Calcola peak automaticamente quando cambiano i valori
+        document.addEventListener('DOMContentLoaded', function() {
+            ['eosProximal', 'eosMid', 'eosDistal'].forEach(id => {
+                document.getElementById(id).addEventListener('input', updatePeak);
+            });
+        });
+        
+        function updatePeak() {
+            const prox = parseInt(document.getElementById('eosProximal').value) || 0;
+            const mid = parseInt(document.getElementById('eosMid').value) || 0;
+            const distal = parseInt(document.getElementById('eosDistal').value) || 0;
+            
+            const values = [
+                { value: prox, label: 'prossimale', id: 'eosProximal' },
+                { value: mid, label: 'medio', id: 'eosMid' },
+                { value: distal, label: 'distale', id: 'eosDistal' }
+            ].filter(v => document.getElementById(v.id).value !== '');
+            
+            const peakValueEl = document.getElementById('peakValue');
+            const peakLocationEl = document.getElementById('peakLocation');
+            
+            if (values.length === 0) {
+                peakValueEl.textContent = '—';
+                peakValueEl.className = 'peak-value';
+                peakLocationEl.textContent = '';
+                return;
+            }
+            
+            const peak = Math.max(...values.map(v => v.value));
+            const peakLocations = values.filter(v => v.value === peak).map(v => v.label);
+            
+            peakValueEl.textContent = peak;
+            peakValueEl.className = 'peak-value ' + (peak >= 15 ? 'above-threshold' : 'below-threshold');
+            peakLocationEl.textContent = '(' + peakLocations.join(', ') + ')';
+        }
+        
         function switchTab(tab) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            // Rimuovi active da tutti i tab buttons
+            document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+            // Rimuovi active da tutti i tab content
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             
-            document.querySelector(`.tab:nth-child(${tab === 'skip' ? 1 : tab === 'grade' ? 2 : 3})`).classList.add('active');
+            // Attiva il tab button corretto
+            const tabIndex = tab === 'skip' ? 0 : tab === 'grade' ? 1 : 2;
+            document.querySelectorAll('.tabs .tab')[tabIndex].classList.add('active');
+            
+            // Attiva il tab content corretto
             document.getElementById('tab-' + tab).classList.add('active');
             activeHssTab = tab;
         }
         
-        function evaluate() {
-            const peakEos = parseInt(document.getElementById('peakEos').value) || 0;
+        function generateDiagnosis() {
+            // Conta eosinofili per livello
+            const eosProximal = document.getElementById('eosProximal').value !== '' ? parseInt(document.getElementById('eosProximal').value) : null;
+            const eosMid = document.getElementById('eosMid').value !== '' ? parseInt(document.getElementById('eosMid').value) : null;
+            const eosDistal = document.getElementById('eosDistal').value !== '' ? parseInt(document.getElementById('eosDistal').value) : null;
+            
+            // Calcola peak e livelli campionati
+            const levels = [];
+            if (eosProximal !== null) levels.push({ value: eosProximal, label: 'prossimale' });
+            if (eosMid !== null) levels.push({ value: eosMid, label: 'medio' });
+            if (eosDistal !== null) levels.push({ value: eosDistal, label: 'distale' });
+            
+            const numLevels = levels.length;
+            const peakEos = numLevels > 0 ? Math.max(...levels.map(l => l.value)) : 0;
+            const peakLocations = levels.filter(l => l.value === peakEos).map(l => l.label);
             
             // Features accessorie
             const features = {
@@ -870,7 +1091,8 @@
             };
             
             // Distribuzione
-            const distribution = document.querySelector('input[name="distribution"]:checked').value;
+            const distributionEl = document.querySelector('input[name="distribution"]:checked');
+            const distribution = distributionEl ? distributionEl.value : 'unknown';
             
             // Conteggio features
             const featuresCount = Object.values(features).filter(f => f).length;
@@ -898,13 +1120,13 @@
                 if (exclusionsCount === 0 && featuresCount >= 2) {
                     diagnosis = "ESOFAGITE EOSINOFILA";
                     diagClass = "diagnosis-confirmed";
-                    diagText = `Criteri istologici soddisfatti: ≥15 eos/HPF (${peakEos}) con ${featuresCount} features accessorie presenti. ` +
+                    diagText = `Criteri istologici soddisfatti: ≥15 eos/HPF (${peakEos}) con ${featuresCount} <em>features</em> accessorie presenti. ` +
                         "La diagnosi è clinico-patologica: verificare presenza di sintomi di disfunzione esofagea ed escludere altre cause.";
                 } 
                 else if (exclusionsCount === 0 && featuresCount < 2) {
                     diagnosis = "QUADRO COMPATIBILE CON EoE";
                     diagClass = "diagnosis-compatible";
-                    diagText = `Presente eosinofilia significativa (${peakEos} eos/HPF) ma con poche features accessorie. ` +
+                    diagText = `Presente eosinofilia significativa (${peakEos} eos/HPF) ma con poche <em>features</em> accessorie. ` +
                         "Correlare con clinica ed endoscopia. Considerare risposta a terapia per conferma.";
                 }
                 else {
@@ -943,7 +1165,11 @@
             const diagBox = document.getElementById('diagnosisBox');
             diagBox.className = 'diagnosis-box ' + diagClass;
             document.getElementById('diagnosisTitle').textContent = diagnosis;
-            document.getElementById('diagnosisText').textContent = diagText;
+            document.getElementById('diagnosisText').innerHTML = diagText;
+            
+            // Riferimento bibliografico
+            const refText = 'Criteri: Dellon ES et al. ACG Clinical Guideline. Am J Gastroenterol 2025;120:31-59 | Collins MH et al. Dis Esophagus 2017;30:1-8';
+            document.getElementById('diagnosisRef').textContent = refText;
             
             // Features list
             const featuresList = document.getElementById('featuresList');
@@ -1007,16 +1233,23 @@
             }
             
             // Report text
-            generateReport(peakEos, features, exclusions, distribution, diagnosis, featuresCount);
+            generateReport(peakEos, levels, features, exclusions, distribution, diagnosis, featuresCount);
         }
         
-        function generateReport(peakEos, features, exclusions, distribution, diagnosis, featuresCount) {
+        function generateReport(peakEos, levels, features, exclusions, distribution, diagnosis, featuresCount) {
             const distMap = {
                 proximal: 'prevalentemente prossimale',
                 distal: 'prevalentemente distale',
                 diffuse: 'diffusa (prossimale e distale)',
                 unknown: 'non valutabile per sede'
             };
+            
+            // Costruisci stringa dettaglio livelli
+            let levelsDetail = '';
+            if (levels.length > 0) {
+                const levelsStr = levels.map(l => `${l.label}: ${l.value}`).join(', ');
+                levelsDetail = `(${levelsStr})`;
+            }
             
             let activeFeatures = [];
             if (features.microabscesses) activeFeatures.push('microascessi eosinofili');
@@ -1032,7 +1265,7 @@
             
             if (peakEos >= 15 && !exclusions.candida && !exclusions.viral && !exclusions.granulomas) {
                 report = `Mucosa esofagea con infiltrato infiammatorio a prevalente componente eosinofila. `;
-                report += `Conta eosinofila massima: ${peakEos} eosinofili/HPF (distribuzione ${distMap[distribution]}). `;
+                report += `Conta eosinofila massima: ${peakEos} eosinofili/HPF ${levelsDetail}. `;
                 
                 if (activeFeatures.length > 0) {
                     report += `Si associano: ${activeFeatures.join(', ')}. `;
@@ -1056,7 +1289,7 @@
                 }
             } 
             else if (peakEos >= 5 && peakEos < 15) {
-                report = `Mucosa esofagea con modesta eosinofilia intraepiteliale (${peakEos} eosinofili/HPF). `;
+                report = `Mucosa esofagea con modesta eosinofilia intraepiteliale (picco: ${peakEos} eosinofili/HPF) ${levelsDetail}. `;
                 if (activeFeatures.length > 0) {
                     report += `Si osservano: ${activeFeatures.join(', ')}. `;
                 }
@@ -1073,6 +1306,9 @@
                 report = `Mucosa esofagea con minima/assente componente eosinofila (${peakEos} eosinofili/HPF). `;
                 report += `Non soddisfatti criteri istologici per esofagite eosinofila.`;
             }
+            
+            // Aggiungo riferimento bibliografico
+            report += `\n\n[Rif: Dellon ES et al. Am J Gastroenterol 2025;120:31-59]`;
             
             document.getElementById('reportText').textContent = report;
         }
