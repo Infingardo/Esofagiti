@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algoritmo Diagnostico Esofagite Eosinofila (EoE)</title>
+    <style>
+        :root {
+            --primary: #2c5282;
+            --secondary: #4a5568;
+            --accent: #3182ce;
+            --bg: #f7fafc;
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
+            --success: #276749;
+            --warning: #c05621;
+            --info: #2b6cb0;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--secondary);
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        h1 {
+            color: var(--primary);
+            font-size: 1.6em;
+            margin-bottom: 8px;
+        }
+        
+        .subtitle {
+            font-size: 0.9em;
+            color: var(--secondary);
+        }
+        
+        .section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        .section-title {
+            color: var(--primary);
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .step-number {
+            background: var(--accent);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: var(--secondary);
+        }
+        
+        input[type="number"] {
+            width: 120px;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 1em;
+        }
+        
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 10px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px;
+            background: var(--bg);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .checkbox-item:hover {
+            background: #edf2f7;
+        }
+        
+        .checkbox-item input {
+            margin-top: 3px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .checkbox-label {
+            flex: 1;
+        }
+        
+        .checkbox-label strong {
+            display: block;
+            color: var(--primary);
+            font-size: 0.95em;
+        }
+        
+        .checkbox-label span {
+            font-size: 0.85em;
+            color: #718096;
+        }
+        
+        .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            background: var(--bg);
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
+        .radio-item input {
+            width: 18px;
+            height: 18px;
+        }
+        
+        button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 1em;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        button:hover {
+            background: var(--primary);
+        }
+        
+        .result {
+            display: none;
+            margin-top: 20px;
+        }
+        
+        .result.show {
+            display: block;
+        }
+        
+        .diagnosis-box {
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .diagnosis-confirmed {
+            background: #c6f6d5;
+            border-left: 4px solid var(--success);
+        }
+        
+        .diagnosis-compatible {
+            background: #feebc8;
+            border-left: 4px solid var(--warning);
+        }
+        
+        .diagnosis-excluded {
+            background: #fed7d7;
+            border-left: 4px solid #c53030;
+        }
+        
+        .diagnosis-insufficient {
+            background: #e2e8f0;
+            border-left: 4px solid var(--secondary);
+        }
+        
+        .diagnosis-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .features-summary {
+            background: var(--bg);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        .features-summary h4 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        .feature-list {
+            list-style: none;
+        }
+        
+        .feature-list li {
+            padding: 5px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .feature-present {
+            color: var(--success);
+        }
+        
+        .feature-absent {
+            color: #a0aec0;
+        }
+        
+        .differential-box {
+            background: #ebf8ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        .differential-box h4 {
+            color: var(--info);
+            margin-bottom: 10px;
+        }
+        
+        .report-text {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: "SF Mono", Monaco, monospace;
+            font-size: 0.9em;
+            white-space: pre-wrap;
+            margin-top: 15px;
+        }
+        
+        .copy-btn {
+            background: var(--secondary);
+            padding: 10px 20px;
+            font-size: 0.9em;
+            width: auto;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        
+        .info-note {
+            background: #ebf8ff;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            margin-top: 10px;
+            border-left: 3px solid var(--accent);
+        }
+        
+        .warning-note {
+            background: #fffaf0;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            margin-top: 10px;
+            border-left: 3px solid var(--warning);
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            background: var(--bg);
+            border: none;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--secondary);
+            width: auto;
+            margin: 0;
+        }
+        
+        .tab.active {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .hss-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        @media (max-width: 600px) {
+            .hss-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .hss-item {
+            background: var(--bg);
+            padding: 12px;
+            border-radius: 8px;
+        }
+        
+        .hss-item label {
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+        
+        .hss-item select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.9em;
+        }
+        
+        .disclaimer {
+            background: #fff5f5;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.85em;
+            margin-top: 30px;
+            border: 1px solid #feb2b2;
+        }
+        
+        .references {
+            font-size: 0.8em;
+            color: #718096;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔬 Algoritmo Diagnostico Istologico per Esofagite Eosinofila</h1>
+            <p class="subtitle">Basato su ACG Guidelines 2025, ESPGHAN 2024, Collins EoE-HSS</p>
+        </header>
+
+        <!-- STEP 1: Conta eosinofili -->
+        <div class="section">
+            <h2 class="section-title">
+                <span class="step-number">1</span>
+                Conta Eosinofili (Peak Eosinophil Count)
+            </h2>
+            
+            <div class="input-group">
+                <label for="peakEos">Numero massimo di eosinofili per HPF (0.24 mm²):</label>
+                <input type="number" id="peakEos" min="0" max="500" value="0">
+            </div>
+            
+            <div class="info-note">
+                <strong>Nota tecnica:</strong> Contare il campo HPF con il maggior numero di eosinofili intraepiteliali. 
+                Il cut-off diagnostico è ≥15 eos/HPF. Ricordare che la malattia è patchy: valutare almeno 6 biopsie da 2 livelli esofagei.
+            </div>
+        </div>
+
+        <!-- STEP 2: Features istologiche accessorie -->
+        <div class="section">
+            <h2 class="section-title">
+                <span class="step-number">2</span>
+                Features Istologiche Accessorie
+            </h2>
+            
+            <div class="checkbox-group">
+                <label class="checkbox-item">
+                    <input type="checkbox" id="microabscesses">
+                    <div class="checkbox-label">
+                        <strong>Microascessi eosinofili</strong>
+                        <span>Cluster ≥4 eosinofili</span>
+                    </div>
+                </label>
+                
+                <label class="checkbox-item">
+                    <input type="checkbox" id="degranulation">
+                    <div class="checkbox-label">
+                        <strong>Degranulazione eosinofila</strong>
+                        <span>Granuli extracellulari visibili</span>
+                    </div>
+                </label>
+                
+                <label class="checkbox-item">
+                    <input type="checkbox" id="surfaceLayering">
+                    <div class="checkbox-label">
+                        <strong>Eosinofili superficiali/intraluminali</strong>
+                        <span>Stratificazione verso il lume</span>
+                    </div>
+                </label>
+                
+                <label class="checkbox-item">
+                    <input type="checkbox" id="spongiosis">
+                    <div class="checkbox-label">
+                        <strong>Spongiosi (DIS)</strong>
+                        <span>Spazi intercellulari dilatati</span>
+                    </div>
+                </label>
+                
+                <label class="checkbox-item">
+                    <input type="checkbox" id="bzh">
+                    <div class="checkbox-label">
+                        <strong>Iperplasia zona basale</strong>
+                        <span>>15-20% dello spessore epiteliale</span>
+                    </div>
+                </label>
+                
+                <label class="checkbox-item">
+                    <input type="checkbox" id="papillae">
+                    <div class="checkbox-label">
+                        <strong>Allungamento papille</strong>
+                        <span>Estensione >2/3 dell'epitelio</span>
+                    </div>
+                </label>
+                
+                <label class="checkbox-item">
+                    <input type="checkbox" id="fibrosis">
+                    <div class="checkbox-label">
+                        <strong>Fibrosi lamina propria</strong>
+                        <span>Se campionata</span>
+                    </div>
+                </label>
+                
+                <label class="checkbox-item">
+                    <input type="checkbox" id="dyskeratosis">
+                    <div class="checkbox-label">
+                        <strong>Alterazioni epiteliali superficiali</strong>
+                        <span>Cellule discheratotiche, SEA</span>
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <!-- STEP 3: Elementi di esclusione -->
+        <div class="section">
+            <h2 class="section-title">
+                <span class="step-number">3</span>
+                Elementi Suggestivi di Diagnosi Alternative
+            </h2>
+            
+            <div class="checkbox-group">
+                <label class="checkbox-item">
+                    <input type="checkbox" id="erosion">
+                    <div class="checkbox-label">
+                        <strong>Erosioni/ulcerazioni</strong>
+                        <span>Favoriscono GERD, farmaci, infezioni</span>
+                    </div>
+                </label>
+                
+                <label class="checkbox-item">
+                    <input type="checkbox" id="neutrophils">
+                    <div class="checkbox-label">
+                        <strong>Neutrofili prominenti</strong>
+                        <span>Non tipici di EoE pura</span>
+                    </div>
+                </label>
+                
+                <label class="checkbox-item">
+                    <input type="checkbox" id="candida">
+                    <div class="checkbox-label">
+                        <strong>Ife fungine (Candida)</strong>
+                        <span>Esofagite infettiva</span>
+                    </div>
+                </label>
+                
+                <label class="checkbox-item">
+                    <input type="checkbox" id="viral">
+                    <div class="checkbox-label">
+                        <strong>Inclusioni virali</strong>
+                        <span>HSV, CMV</span>
+                    </div>
+                </label>
+                
+                <label class="checkbox-item">
+                    <input type="checkbox" id="granulomas">
+                    <div class="checkbox-label">
+                        <strong>Granulomi</strong>
+                        <span>Considerare Crohn esofageo</span>
+                    </div>
+                </label>
+                
+                <label class="checkbox-item">
+                    <input type="checkbox" id="gastricEos">
+                    <div class="checkbox-label">
+                        <strong>Eosinofilia gastrica/duodenale</strong>
+                        <span>Considerare EGE, EGID</span>
+                    </div>
+                </label>
+            </div>
+            
+            <div class="warning-note">
+                <strong>Attenzione:</strong> La presenza di erosioni è inusuale nella EoE e suggerisce GERD o altra eziologia. 
+                Neutrofili e infezioni escludono la diagnosi di EoE primaria.
+            </div>
+        </div>
+
+        <!-- STEP 4: Localizzazione -->
+        <div class="section">
+            <h2 class="section-title">
+                <span class="step-number">4</span>
+                Distribuzione dell'Eosinofilia
+            </h2>
+            
+            <div class="radio-group">
+                <label class="radio-item">
+                    <input type="radio" name="distribution" value="proximal" id="distProximal">
+                    <span>Solo prossimale/medio</span>
+                </label>
+                <label class="radio-item">
+                    <input type="radio" name="distribution" value="distal" id="distDistal">
+                    <span>Solo distale</span>
+                </label>
+                <label class="radio-item">
+                    <input type="radio" name="distribution" value="diffuse" id="distDiffuse" checked>
+                    <span>Diffusa (prox + dist)</span>
+                </label>
+                <label class="radio-item">
+                    <input type="radio" name="distribution" value="unknown" id="distUnknown">
+                    <span>Non valutabile</span>
+                </label>
+            </div>
+            
+            <div class="info-note">
+                <strong>Nota:</strong> Nell'EoE l'eosinofilia è tipicamente diffusa ma può essere più marcata distalmente. 
+                Un pattern esclusivamente distale richiede maggiore attenzione per escludere GERD.
+            </div>
+        </div>
+
+        <!-- STEP 5: EoE-HSS opzionale -->
+        <div class="section">
+            <h2 class="section-title">
+                <span class="step-number">5</span>
+                EoE Histologic Scoring System (Collins) - Opzionale
+            </h2>
+            
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('skip')">Salta HSS</button>
+                <button class="tab" onclick="switchTab('grade')">Compila Grade</button>
+                <button class="tab" onclick="switchTab('stage')">Compila Stage</button>
+            </div>
+            
+            <div id="tab-skip" class="tab-content active">
+                <p>Lo scoring HSS è opzionale per la diagnosi di routine ma utile per follow-up e trial clinici.</p>
+            </div>
+            
+            <div id="tab-grade" class="tab-content">
+                <p style="margin-bottom: 15px;"><strong>Grade (Severità):</strong> Valuta l'intensità massima di ogni feature (0-3)</p>
+                <div class="hss-grid">
+                    <div class="hss-item">
+                        <label>Eosinophil Inflammation (EI)</label>
+                        <select id="hss_ei_grade">
+                            <option value="0">0 - Assente (0 eos)</option>
+                            <option value="1">1 - Lieve (1-14 eos)</option>
+                            <option value="2">2 - Moderata (15-60 eos)</option>
+                            <option value="3">3 - Severa (>60 eos)</option>
+                        </select>
+                    </div>
+                    <div class="hss-item">
+                        <label>Basal Zone Hyperplasia (BZH)</label>
+                        <select id="hss_bzh_grade">
+                            <option value="0">0 - Normale (<15%)</option>
+                            <option value="1">1 - Lieve (15-33%)</option>
+                            <option value="2">2 - Moderata (34-66%)</option>
+                            <option value="3">3 - Severa (>66%)</option>
+                        </select>
+                    </div>
+                    <div class="hss-item">
+                        <label>Eosinophil Abscess (EA)</label>
+                        <select id="hss_ea_grade">
+                            <option value="0">0 - Assente</option>
+                            <option value="1">1 - 4-10 eos</option>
+                            <option value="2">2 - 11-20 eos</option>
+                            <option value="3">3 - >20 eos</option>
+                        </select>
+                    </div>
+                    <div class="hss-item">
+                        <label>Eosinophil Surface Layering (ESL)</label>
+                        <select id="hss_esl_grade">
+                            <option value="0">0 - Assente</option>
+                            <option value="1">1 - 1-4 eos in fila</option>
+                            <option value="2">2 - 5-10 eos in fila</option>
+                            <option value="3">3 - >10 eos in fila</option>
+                        </select>
+                    </div>
+                    <div class="hss-item">
+                        <label>Dilated Intercellular Spaces (DIS)</label>
+                        <select id="hss_dis_grade">
+                            <option value="0">0 - Assente</option>
+                            <option value="1">1 - Visibile a 400x</option>
+                            <option value="2">2 - Visibile a 200x</option>
+                            <option value="3">3 - Visibile a 100x</option>
+                        </select>
+                    </div>
+                    <div class="hss-item">
+                        <label>Surface Epithelial Alteration (SEA)</label>
+                        <select id="hss_sea_grade">
+                            <option value="0">0 - Assente</option>
+                            <option value="1">1 - Focale, sottile</option>
+                            <option value="2">2 - Moderata</option>
+                            <option value="3">3 - Diffusa, marcata</option>
+                        </select>
+                    </div>
+                    <div class="hss-item">
+                        <label>Dyskeratotic Epithelial Cells (DEC)</label>
+                        <select id="hss_dec_grade">
+                            <option value="0">0 - Assente</option>
+                            <option value="1">1 - Rare</option>
+                            <option value="2">2 - Frequenti</option>
+                            <option value="3">3 - Numerose</option>
+                        </select>
+                    </div>
+                    <div class="hss-item">
+                        <label>Lamina Propria Fibrosis (LPF)</label>
+                        <select id="hss_lpf_grade">
+                            <option value="0">0 - Assente</option>
+                            <option value="1">1 - Lieve</option>
+                            <option value="2">2 - Moderata</option>
+                            <option value="3">3 - Severa</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="tab-stage" class="tab-content">
+                <p style="margin-bottom: 15px;"><strong>Stage (Estensione):</strong> Valuta la percentuale di tessuto coinvolto (0-3)</p>
+                <div class="hss-grid">
+                    <div class="hss-item">
+                        <label>EI Stage</label>
+                        <select id="hss_ei_stage">
+                            <option value="0">0 - 0%</option>
+                            <option value="1">1 - <33%</option>
+                            <option value="2">2 - 34-66%</option>
+                            <option value="3">3 - >66%</option>
+                        </select>
+                    </div>
+                    <div class="hss-item">
+                        <label>BZH Stage</label>
+                        <select id="hss_bzh_stage">
+                            <option value="0">0 - 0%</option>
+                            <option value="1">1 - <33%</option>
+                            <option value="2">2 - 34-66%</option>
+                            <option value="3">3 - >66%</option>
+                        </select>
+                    </div>
+                    <div class="hss-item">
+                        <label>EA Stage</label>
+                        <select id="hss_ea_stage">
+                            <option value="0">0 - 0%</option>
+                            <option value="1">1 - <33%</option>
+                            <option value="2">2 - 34-66%</option>
+                            <option value="3">3 - >66%</option>
+                        </select>
+                    </div>
+                    <div class="hss-item">
+                        <label>ESL Stage</label>
+                        <select id="hss_esl_stage">
+                            <option value="0">0 - 0%</option>
+                            <option value="1">1 - <33%</option>
+                            <option value="2">2 - 34-66%</option>
+                            <option value="3">3 - >66%</option>
+                        </select>
+                    </div>
+                    <div class="hss-item">
+                        <label>DIS Stage</label>
+                        <select id="hss_dis_stage">
+                            <option value="0">0 - 0%</option>
+                            <option value="1">1 - <33%</option>
+                            <option value="2">2 - 34-66%</option>
+                            <option value="3">3 - >66%</option>
+                        </select>
+                    </div>
+                    <div class="hss-item">
+                        <label>SEA Stage</label>
+                        <select id="hss_sea_stage">
+                            <option value="0">0 - 0%</option>
+                            <option value="1">1 - <33%</option>
+                            <option value="2">2 - 34-66%</option>
+                            <option value="3">3 - >66%</option>
+                        </select>
+                    </div>
+                    <div class="hss-item">
+                        <label>DEC Stage</label>
+                        <select id="hss_dec_stage">
+                            <option value="0">0 - 0%</option>
+                            <option value="1">1 - <33%</option>
+                            <option value="2">2 - 34-66%</option>
+                            <option value="3">3 - >66%</option>
+                        </select>
+                    </div>
+                    <div class="hss-item">
+                        <label>LPF Stage</label>
+                        <select id="hss_lpf_stage">
+                            <option value="0">0 - 0%</option>
+                            <option value="1">1 - <33%</option>
+                            <option value="2">2 - 34-66%</option>
+                            <option value="3">3 - >66%</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button onclick="evaluate()">📋 Genera Valutazione Diagnostica</button>
+
+        <!-- RISULTATI -->
+        <div id="result" class="result">
+            <div class="section">
+                <h2 class="section-title">Valutazione Diagnostica</h2>
+                
+                <div id="diagnosisBox" class="diagnosis-box">
+                    <div id="diagnosisTitle" class="diagnosis-title"></div>
+                    <div id="diagnosisText"></div>
+                </div>
+                
+                <div id="featuresSummary" class="features-summary">
+                    <h4>Riepilogo Features Istologiche</h4>
+                    <ul id="featuresList" class="feature-list"></ul>
+                </div>
+                
+                <div id="differentialBox" class="differential-box">
+                    <h4>⚠️ Diagnosi Differenziale</h4>
+                    <div id="differentialText"></div>
+                </div>
+                
+                <div id="hssResult" style="display: none;">
+                    <h4 style="margin-top: 15px; color: var(--primary);">EoE-HSS Score</h4>
+                    <div id="hssScores" style="background: var(--bg); padding: 15px; border-radius: 8px; margin-top: 10px;"></div>
+                </div>
+                
+                <h4 style="margin-top: 20px; color: var(--primary);">Suggerimento Referto</h4>
+                <div id="reportText" class="report-text"></div>
+                <button class="copy-btn" onclick="copyReport()">📋 Copia Referto</button>
+            </div>
+        </div>
+
+        <div class="disclaimer">
+            <strong>⚠️ Disclaimer:</strong> Questo strumento è un supporto decisionale per il patologo. 
+            La diagnosi di EoE è clinico-patologica e richiede l'integrazione con dati clinici ed endoscopici. 
+            Il conteggio eosinofilo da solo non è patognomonico. La risposta a PPI non esclude più la diagnosi di EoE (dal 2018).
+            Per ogni caso dubbio, consultare le linee guida aggiornate e correlare con il clinico.
+        </div>
+
+        <div class="references">
+            <strong>Bibliografia:</strong><br><br>
+            
+            <strong>Linee guida e consensus</strong><br>
+            1. Dellon ES, Muir AB, Katzka DA, et al. <em>ACG Clinical Guideline: Diagnosis and Management of Eosinophilic Esophagitis.</em> Am J Gastroenterol 2025;120(1):31-59. doi:10.14309/ajg.0000000000003194<br>
+            2. Amil-Dias J, Oliva S, Papadopoulou A, et al. <em>Diagnosis and management of eosinophilic esophagitis in children: An ESPGHAN EGID Working Group update.</em> J Pediatr Gastroenterol Nutr 2024;79(1):1-44. doi:10.1002/jpn3.12188<br>
+            3. Dellon ES, Liacouras CA, Molina-Infante J, et al. <em>Updated international consensus diagnostic criteria for eosinophilic esophagitis: Proceedings of the AGREE Conference.</em> Gastroenterology 2018;155(4):1022-1033. doi:10.1053/j.gastro.2018.07.009<br>
+            4. Dhar A, Haboubi HN, Attwood SE, et al. <em>BSG and BSPGHAN joint consensus guidelines on the diagnosis and management of eosinophilic oesophagitis in children and adults.</em> Gut 2022;71(8):1459-1487. doi:10.1136/gutjnl-2022-327326<br>
+            5. Lucendo AJ, Molina-Infante J, Arias Á, et al. <em>Guidelines on eosinophilic esophagitis: evidence-based statements and recommendations for diagnosis and management in children and adults.</em> United European Gastroenterol J 2017;5(3):335-358<br><br>
+            
+            <strong>Istopatologia e scoring system</strong><br>
+            6. Collins MH, Martin LJ, Alexander ES, et al. <em>Newly developed and validated eosinophilic esophagitis histology scoring system and evidence that it outperforms peak eosinophil count for disease diagnosis and monitoring.</em> Dis Esophagus 2017;30(3):1-8. doi:10.1111/dote.12470<br>
+            7. Collins MH, Arva NC, Bernieh A, et al. <em>Histopathology of Eosinophilic Esophagitis.</em> Immunol Allergy Clin North Am 2024;44(2):205-221. doi:10.1016/j.iac.2023.12.008<br>
+            8. Ma C, Jairath V, Feagan BG, et al. <em>Responsiveness of a Histologic Scoring System Compared With Peak Eosinophil Count in Eosinophilic Esophagitis.</em> Am J Gastroenterol 2022;117(2):264-271. doi:10.14309/ajg.0000000000001571<br>
+            9. Collins MH, Martin LJ, Wen T, et al. <em>Eosinophilic Esophagitis Histology Remission Score: Significant Relations to Measures of Disease Activity and Symptoms.</em> J Pediatr Gastroenterol Nutr 2020;70(5):598-603. doi:10.1097/MPG.0000000000002637<br>
+            10. Alexander RG, Ravi K, Collins MH, et al. <em>Eosinophilic Esophagitis Histologic Scoring System: Correlation with Histologic, Endoscopic, and Symptomatic Disease and Clinical Use.</em> Dig Dis Sci 2023;68(9):3629-3637. doi:10.1007/s10620-023-08029-0<br><br>
+            
+            <strong>Diagnosi differenziale</strong><br>
+            11. Katzka DA, Dellon ES. <em>Distinguishing GERD from eosinophilic oesophagitis: concepts and controversies.</em> Nat Rev Gastroenterol Hepatol 2016;13(8):479-486. doi:10.1038/nrgastro.2016.84<br>
+            12. Dellon ES. <em>Diagnostics of eosinophilic esophagitis: clinical, endoscopic, and histologic pitfalls.</em> Dig Dis 2014;32(1-2):48-53. doi:10.1159/000357072<br>
+            13. Lin B, Rabinowitz S, Haseeb MA, et al. <em>Usefulness of the Eosinophilic Esophagitis Histologic Scoring System in Distinguishing Active Eosinophilic Esophagitis From Remission and Gastroesophageal Reflux Disease.</em> Gastroenterology Res 2021;14(4):236-244. doi:10.14740/gr1423<br><br>
+            
+            <strong>Review e aggiornamenti recenti</strong><br>
+            14. Muir A, Falk GW. <em>Eosinophilic Esophagitis: A Review.</em> JAMA 2021;326(13):1310-1318. doi:10.1001/jama.2021.14920<br>
+            15. McGowan EC, Wright BL, Ruffner MA, et al. <em>Eosinophilic esophagitis: An allergy and immunology perspective on the updated guidelines.</em> J Allergy Clin Immunol 2025;156(2):252-258. doi:10.1016/j.jaci.2025.04.026<br>
+            16. Wierzbicka A, Ukleja A. <em>Update on the management of eosinophilic esophagitis in adult patients.</em> Explor Asthma Allergy 2025;3:100998. doi:10.37349/eaa.2025.100998<br>
+            17. Erdle SC, Carr S, Chan ES, et al. <em>Eosinophilic esophagitis.</em> Allergy Asthma Clin Immunol 2024;20(Suppl 3):72. doi:10.1186/s13223-024-00929-0<br>
+            
+            <br><em style="color: #718096;">Ultimo aggiornamento: Dicembre 2025</em>
+        </div>
+    </div>
+
+    <script>
+        let activeHssTab = 'skip';
+        
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            document.querySelector(`.tab:nth-child(${tab === 'skip' ? 1 : tab === 'grade' ? 2 : 3})`).classList.add('active');
+            document.getElementById('tab-' + tab).classList.add('active');
+            activeHssTab = tab;
+        }
+        
+        function evaluate() {
+            const peakEos = parseInt(document.getElementById('peakEos').value) || 0;
+            
+            // Features accessorie
+            const features = {
+                microabscesses: document.getElementById('microabscesses').checked,
+                degranulation: document.getElementById('degranulation').checked,
+                surfaceLayering: document.getElementById('surfaceLayering').checked,
+                spongiosis: document.getElementById('spongiosis').checked,
+                bzh: document.getElementById('bzh').checked,
+                papillae: document.getElementById('papillae').checked,
+                fibrosis: document.getElementById('fibrosis').checked,
+                dyskeratosis: document.getElementById('dyskeratosis').checked
+            };
+            
+            // Elementi di esclusione
+            const exclusions = {
+                erosion: document.getElementById('erosion').checked,
+                neutrophils: document.getElementById('neutrophils').checked,
+                candida: document.getElementById('candida').checked,
+                viral: document.getElementById('viral').checked,
+                granulomas: document.getElementById('granulomas').checked,
+                gastricEos: document.getElementById('gastricEos').checked
+            };
+            
+            // Distribuzione
+            const distribution = document.querySelector('input[name="distribution"]:checked').value;
+            
+            // Conteggio features
+            const featuresCount = Object.values(features).filter(f => f).length;
+            const exclusionsCount = Object.values(exclusions).filter(e => e).length;
+            
+            // Logica diagnostica
+            let diagnosis, diagClass, diagText;
+            let differentials = [];
+            
+            // Esclusioni assolute
+            if (exclusions.candida || exclusions.viral) {
+                diagnosis = "ESOFAGITE INFETTIVA - Esclude EoE primaria";
+                diagClass = "diagnosis-excluded";
+                diagText = "La presenza di infezione fungina o virale esclude la diagnosi di EoE primaria. Trattare l'infezione e rivalutare.";
+                differentials = ["Esofagite da Candida", "Esofagite erpetica/CMV"];
+            }
+            else if (exclusions.granulomas) {
+                diagnosis = "CONSIDERARE MALATTIA DI CROHN ESOFAGEA";
+                diagClass = "diagnosis-excluded";
+                diagText = "La presenza di granulomi non-necrotizzanti richiede esclusione di Crohn esofageo. L'eosinofilia può essere secondaria.";
+                differentials = ["Malattia di Crohn", "Sarcoidosi", "Infezione granulomatosa"];
+            }
+            else if (peakEos >= 15) {
+                // Sopra soglia diagnostica
+                if (exclusionsCount === 0 && featuresCount >= 2) {
+                    diagnosis = "ESOFAGITE EOSINOFILA";
+                    diagClass = "diagnosis-confirmed";
+                    diagText = `Criteri istologici soddisfatti: ≥15 eos/HPF (${peakEos}) con ${featuresCount} features accessorie presenti. ` +
+                        "La diagnosi è clinico-patologica: verificare presenza di sintomi di disfunzione esofagea ed escludere altre cause.";
+                } 
+                else if (exclusionsCount === 0 && featuresCount < 2) {
+                    diagnosis = "QUADRO COMPATIBILE CON EoE";
+                    diagClass = "diagnosis-compatible";
+                    diagText = `Presente eosinofilia significativa (${peakEos} eos/HPF) ma con poche features accessorie. ` +
+                        "Correlare con clinica ed endoscopia. Considerare risposta a terapia per conferma.";
+                }
+                else {
+                    diagnosis = "EOSINOFILIA ESOFAGEA - DIAGNOSI DIFFERENZIALE NECESSARIA";
+                    diagClass = "diagnosis-compatible";
+                    diagText = `Eosinofilia significativa (${peakEos} eos/HPF) ma con elementi atipici. ` +
+                        "Escludere altre cause prima di confermare EoE.";
+                    
+                    if (exclusions.erosion) differentials.push("GERD erosiva");
+                    if (exclusions.neutrophils) differentials.push("Esofagite acuta/infettiva");
+                    if (exclusions.gastricEos) differentials.push("Gastroenterite eosinofila (EGE)");
+                }
+            }
+            else if (peakEos >= 5 && peakEos < 15) {
+                diagnosis = "EOSINOFILIA ESOFAGEA LIEVE - NON DIAGNOSTICA PER EoE";
+                diagClass = "diagnosis-insufficient";
+                diagText = `Eosinofilia presente ma sotto soglia diagnostica (${peakEos} eos/HPF, cut-off ≥15). ` +
+                    "Considerare: (1) GERD con eosinofilia reattiva, (2) EoE in trattamento/remissione parziale, (3) Campionamento subottimale.";
+                differentials = ["GERD", "EoE in remissione parziale", "Rivalutare con ulteriori biopsie"];
+            }
+            else {
+                diagnosis = "ASSENZA DI EOSINOFILIA SIGNIFICATIVA";
+                diagClass = "diagnosis-excluded";
+                diagText = `Conta eosinofila normale/minima (${peakEos} eos/HPF). Non soddisfatti criteri per EoE. ` +
+                    "Se clinica suggestiva, considerare: (1) EoE in remissione, (2) Campionamento inadeguato, (3) Effetto terapia in corso.";
+            }
+            
+            // Nota sulla distribuzione
+            if (distribution === 'distal' && peakEos >= 15) {
+                differentials.push("Pattern esclusivamente distale: considerare componente GERD");
+            }
+            
+            // Aggiorna UI
+            document.getElementById('result').classList.add('show');
+            
+            const diagBox = document.getElementById('diagnosisBox');
+            diagBox.className = 'diagnosis-box ' + diagClass;
+            document.getElementById('diagnosisTitle').textContent = diagnosis;
+            document.getElementById('diagnosisText').textContent = diagText;
+            
+            // Features list
+            const featuresList = document.getElementById('featuresList');
+            featuresList.innerHTML = '';
+            
+            const featureNames = {
+                microabscesses: 'Microascessi eosinofili',
+                degranulation: 'Degranulazione eosinofila',
+                surfaceLayering: 'Eosinofili superficiali',
+                spongiosis: 'Spongiosi (DIS)',
+                bzh: 'Iperplasia zona basale',
+                papillae: 'Allungamento papille',
+                fibrosis: 'Fibrosi lamina propria',
+                dyskeratosis: 'Alterazioni epiteliali'
+            };
+            
+            for (const [key, name] of Object.entries(featureNames)) {
+                const li = document.createElement('li');
+                li.className = features[key] ? 'feature-present' : 'feature-absent';
+                li.innerHTML = `${features[key] ? '✓' : '○'} ${name}`;
+                featuresList.appendChild(li);
+            }
+            
+            // Differential diagnosis
+            const diffBox = document.getElementById('differentialBox');
+            const diffText = document.getElementById('differentialText');
+            
+            if (differentials.length > 0) {
+                diffBox.style.display = 'block';
+                diffText.innerHTML = '<ul>' + differentials.map(d => `<li>${d}</li>`).join('') + '</ul>';
+            } else {
+                diffBox.style.display = 'none';
+            }
+            
+            // HSS Score
+            if (activeHssTab !== 'skip') {
+                const hssResult = document.getElementById('hssResult');
+                const hssScores = document.getElementById('hssScores');
+                
+                let gradeTotal = 0, stageTotal = 0;
+                const features_hss = ['ei', 'bzh', 'ea', 'esl', 'dis', 'sea', 'dec', 'lpf'];
+                
+                features_hss.forEach(f => {
+                    gradeTotal += parseInt(document.getElementById(`hss_${f}_grade`).value) || 0;
+                    stageTotal += parseInt(document.getElementById(`hss_${f}_stage`).value) || 0;
+                });
+                
+                const gradeNorm = (gradeTotal / 24).toFixed(2);
+                const stageNorm = (stageTotal / 24).toFixed(2);
+                
+                hssResult.style.display = 'block';
+                hssScores.innerHTML = `
+                    <p><strong>Grade Score:</strong> ${gradeTotal}/24 (normalizzato: ${gradeNorm})</p>
+                    <p><strong>Stage Score:</strong> ${stageTotal}/24 (normalizzato: ${stageNorm})</p>
+                    <p style="font-size: 0.85em; color: #718096; margin-top: 10px;">
+                        Remissione istologica (EoEHRS): EI grade 0-1, EI stage 0, total grade ≤3, total stage ≤3
+                    </p>
+                `;
+            } else {
+                document.getElementById('hssResult').style.display = 'none';
+            }
+            
+            // Report text
+            generateReport(peakEos, features, exclusions, distribution, diagnosis, featuresCount);
+        }
+        
+        function generateReport(peakEos, features, exclusions, distribution, diagnosis, featuresCount) {
+            const distMap = {
+                proximal: 'prevalentemente prossimale',
+                distal: 'prevalentemente distale',
+                diffuse: 'diffusa (prossimale e distale)',
+                unknown: 'non valutabile per sede'
+            };
+            
+            let activeFeatures = [];
+            if (features.microabscesses) activeFeatures.push('microascessi eosinofili');
+            if (features.degranulation) activeFeatures.push('degranulazione eosinofila');
+            if (features.surfaceLayering) activeFeatures.push('eosinofili superficiali');
+            if (features.spongiosis) activeFeatures.push('spongiosi');
+            if (features.bzh) activeFeatures.push('iperplasia della zona basale');
+            if (features.papillae) activeFeatures.push('allungamento delle papille');
+            if (features.fibrosis) activeFeatures.push('fibrosi della lamina propria');
+            if (features.dyskeratosis) activeFeatures.push('alterazioni epiteliali superficiali');
+            
+            let report = '';
+            
+            if (peakEos >= 15 && !exclusions.candida && !exclusions.viral && !exclusions.granulomas) {
+                report = `Mucosa esofagea con infiltrato infiammatorio a prevalente componente eosinofila. `;
+                report += `Conta eosinofila massima: ${peakEos} eosinofili/HPF (distribuzione ${distMap[distribution]}). `;
+                
+                if (activeFeatures.length > 0) {
+                    report += `Si associano: ${activeFeatures.join(', ')}. `;
+                }
+                
+                if (exclusions.erosion || exclusions.neutrophils) {
+                    report += `Nota: presenti anche elementi atipici (`;
+                    let atypical = [];
+                    if (exclusions.erosion) atypical.push('erosioni');
+                    if (exclusions.neutrophils) atypical.push('neutrofili');
+                    report += atypical.join(', ') + `). `;
+                }
+                
+                report += `\n\nCONCLUSIONE: `;
+                if (featuresCount >= 2 && !exclusions.erosion && !exclusions.neutrophils) {
+                    report += `Quadro istologico compatibile con ESOFAGITE EOSINOFILA. `;
+                    report += `Correlare con dati clinico-endoscopici per conferma diagnostica.`;
+                } else {
+                    report += `Eosinofilia esofagea significativa. Quadro compatibile con esofagite eosinofila, `;
+                    report += `tuttavia si raccomanda correlazione clinico-endoscopica ed esclusione di altre cause di eosinofilia esofagea.`;
+                }
+            } 
+            else if (peakEos >= 5 && peakEos < 15) {
+                report = `Mucosa esofagea con modesta eosinofilia intraepiteliale (${peakEos} eosinofili/HPF). `;
+                if (activeFeatures.length > 0) {
+                    report += `Si osservano: ${activeFeatures.join(', ')}. `;
+                }
+                report += `\n\nCONCLUSIONE: Eosinofilia esofagea sotto soglia diagnostica per esofagite eosinofila (cut-off ≥15 eos/HPF). `;
+                report += `Possibile GERD con eosinofilia reattiva o EoE in remissione parziale. Correlare con clinica.`;
+            }
+            else if (exclusions.candida || exclusions.viral) {
+                report = `Mucosa esofagea con segni di esofagite infettiva. `;
+                if (exclusions.candida) report += `Presenti ife fungine compatibili con Candida. `;
+                if (exclusions.viral) report += `Presenti inclusioni virali. `;
+                report += `L'eosinofilia eventualmente presente è da considerarsi secondaria.`;
+            }
+            else {
+                report = `Mucosa esofagea con minima/assente componente eosinofila (${peakEos} eosinofili/HPF). `;
+                report += `Non soddisfatti criteri istologici per esofagite eosinofila.`;
+            }
+            
+            document.getElementById('reportText').textContent = report;
+        }
+        
+        function copyReport() {
+            const report = document.getElementById('reportText').textContent;
+            navigator.clipboard.writeText(report).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                btn.textContent = '✓ Copiato!';
+                setTimeout(() => btn.textContent = '📋 Copia Referto', 2000);
+            });
+        }
+    </script>
+</body>
+</html>
