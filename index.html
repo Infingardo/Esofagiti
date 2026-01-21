@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Algoritmo Diagnostico Esofagite Eosinofila (EoE)</title>
+    <title>Algoritmo Diagnostico Esofagite Eosinofila (EoE) v1.1</title>
     <style>
         :root {
             --primary: #2c5282;
@@ -465,8 +465,11 @@
             padding: 15px;
             border-radius: 8px;
             font-size: 0.85em;
-            margin-top: 30px;
-            border: 1px solid #feb2b2;
+            border: 2px solid #fc8181;
+        }
+        
+        .disclaimer strong {
+            color: #c53030;
         }
         
         .references {
@@ -525,7 +528,7 @@
     <div class="container">
         <header>
             <h1>🔬 Algoritmo Diagnostico Istologico per Esofagite Eosinofila</h1>
-            <p class="subtitle">Basato su ACG Guidelines 2025, ESPGHAN 2024, Collins EoE-HSS</p>
+            <p class="subtitle">Basato su ACG Guidelines 2025, ESPGHAN 2024, Collins EoE-HSS | v1.1</p>
         </header>
 
         <!-- STEP 1: Conta eosinofili -->
@@ -570,7 +573,8 @@
             
             <div class="info-note">
                 <strong>Nota:</strong> Inserire il valore massimo per ciascun livello campionato. Lasciare vuoto se non campionato.
-                Cut-off diagnostico: ≥15 eos/HPF. Campo standard: 0.24 mm².
+                Cut-off diagnostico: ≥15 eos/HPF. <strong>Campo standard teorico: 0.24 mm²</strong> - verificare l'area del proprio microscopio 
+                (varia tra 0.20-0.30 mm² secondo casa produttrice).
             </div>
         </div>
 
@@ -660,7 +664,7 @@
                     <input type="checkbox" id="erosion">
                     <div class="checkbox-label">
                         <strong>Erosioni/ulcerazioni</strong>
-                        <span>Favoriscono GERD, farmaci, infezioni</span>
+                        <span>Inusuali in EoE, considerare GERD/farmaci</span>
                     </div>
                 </label>
                 
@@ -668,7 +672,7 @@
                     <input type="checkbox" id="neutrophils">
                     <div class="checkbox-label">
                         <strong>Neutrofili prominenti</strong>
-                        <span>Non tipici di EoE pura</span>
+                        <span>Red flag per altra eziologia (salvo post-procedura)</span>
                     </div>
                 </label>
                 
@@ -706,8 +710,8 @@
             </div>
             
             <div class="warning-note">
-                <strong>Attenzione:</strong> La presenza di erosioni è inusuale nella EoE e suggerisce GERD o altra eziologia. 
-                Neutrofili e infezioni escludono la diagnosi di EoE primaria.
+                <strong>Attenzione:</strong> Erosioni e neutrofili sono inusuali nella EoE pura (possono vedersi post-impaction o post-dilatazione). 
+                Infezioni escludono EoE primaria.
             </div>
         </div>
 
@@ -925,12 +929,20 @@
             </div>
         </div>
 
-        <button type="button" onclick="generateDiagnosis()">📋 Genera Valutazione Diagnostica</button>
+        <div class="disclaimer">
+            <strong>⚠️ DISCLAIMER:</strong> Questo strumento è un <strong>supporto decisionale</strong> per il patologo. 
+            La diagnosi di EoE è <strong>clinico-patologica</strong> e richiede l'integrazione con dati clinici ed endoscopici. 
+            Il conteggio eosinofilo da solo non è patognomonico. La risposta a PPI non esclude più la diagnosi di EoE (dal 2018). 
+            Questo tool genera una <strong>proposta diagnostica</strong> da validare nel contesto del caso specifico.
+            Per ogni caso dubbio, consultare le linee guida aggiornate e correlare con il clinico.
+        </div>
+
+        <button type="button" onclick="generateDiagnosis()">📋 Genera Proposta Diagnostica</button>
 
         <!-- RISULTATI -->
         <div id="result" class="result">
             <div class="section">
-                <h2 class="section-title">Valutazione Diagnostica</h2>
+                <h2 class="section-title">Proposta Diagnostica</h2>
                 
                 <div id="diagnosisBox" class="diagnosis-box">
                     <div id="diagnosisTitle" class="diagnosis-title"></div>
@@ -957,13 +969,6 @@
                 <div id="reportText" class="report-text"></div>
                 <button type="button" class="copy-btn" onclick="copyReport()">📋 Copia Referto</button>
             </div>
-        </div>
-
-        <div class="disclaimer">
-            <strong>⚠️ Disclaimer:</strong> Questo strumento è un supporto decisionale per il patologo. 
-            La diagnosi di EoE è clinico-patologica e richiede l'integrazione con dati clinici ed endoscopici. 
-            Il conteggio eosinofilo da solo non è patognomonico. La risposta a PPI non esclude più la diagnosi di EoE (dal 2018).
-            Per ogni caso dubbio, consultare le linee guida aggiornate e correlare con il clinico.
         </div>
 
         <div class="references">
@@ -994,7 +999,7 @@
             16. Wierzbicka A, Ukleja A. <em>Update on the management of eosinophilic esophagitis in adult patients.</em> Explor Asthma Allergy 2025;3:100998. doi:10.37349/eaa.2025.100998<br>
             17. Erdle SC, Carr S, Chan ES, et al. <em>Eosinophilic esophagitis.</em> Allergy Asthma Clin Immunol 2024;20(Suppl 3):72. doi:10.1186/s13223-024-00929-0<br>
             
-            <br><em style="color: #718096;">Ultimo aggiornamento: Dicembre 2025</em>
+            <br><em style="color: #718096;">Ultimo aggiornamento: Gennaio 2026 (v1.1)</em>
         </div>
     </div>
 
@@ -1068,7 +1073,7 @@
             const peakEos = numLevels > 0 ? Math.max(...levels.map(l => l.value)) : 0;
             const peakLocations = levels.filter(l => l.value === peakEos).map(l => l.label);
             
-            // Features accessorie
+            // Features accessorie - con valutazione qualitativa
             const features = {
                 microabscesses: document.getElementById('microabscesses').checked,
                 degranulation: document.getElementById('degranulation').checked,
@@ -1080,6 +1085,22 @@
                 dyskeratosis: document.getElementById('dyskeratosis').checked
             };
             
+            // Features ad alta specificità
+            const highSpecificityCount = 
+                (features.microabscesses ? 1 : 0) +
+                (features.degranulation ? 1 : 0) +
+                (features.surfaceLayering ? 1 : 0);
+            
+            // Features a bassa specificità
+            const lowSpecificityCount = 
+                (features.spongiosis ? 1 : 0) +
+                (features.bzh ? 1 : 0) +
+                (features.papillae ? 1 : 0) +
+                (features.fibrosis ? 1 : 0) +
+                (features.dyskeratosis ? 1 : 0);
+            
+            const totalFeaturesCount = highSpecificityCount + lowSpecificityCount;
+            
             // Elementi di esclusione
             const exclusions = {
                 erosion: document.getElementById('erosion').checked,
@@ -1090,15 +1111,13 @@
                 gastricEos: document.getElementById('gastricEos').checked
             };
             
+            const exclusionsCount = Object.values(exclusions).filter(e => e).length;
+            
             // Distribuzione
             const distributionEl = document.querySelector('input[name="distribution"]:checked');
             const distribution = distributionEl ? distributionEl.value : 'unknown';
             
-            // Conteggio features
-            const featuresCount = Object.values(features).filter(f => f).length;
-            const exclusionsCount = Object.values(exclusions).filter(e => e).length;
-            
-            // Logica diagnostica
+            // Logica diagnostica modificata - meno rigida su conteggio features
             let diagnosis, diagClass, diagText;
             let differentials = [];
             
@@ -1116,28 +1135,36 @@
                 differentials = ["Malattia di Crohn", "Sarcoidosi", "Infezione granulomatosa"];
             }
             else if (peakEos >= 15) {
-                // Sopra soglia diagnostica
-                if (exclusionsCount === 0 && featuresCount >= 2) {
+                // Sopra soglia diagnostica - valutazione qualitativa delle features
+                if (exclusionsCount === 0 && (highSpecificityCount >= 2 || totalFeaturesCount >= 3)) {
                     diagnosis = "ESOFAGITE EOSINOFILA";
                     diagClass = "diagnosis-confirmed";
-                    diagText = `Criteri istologici soddisfatti: ≥15 eos/HPF (${peakEos}) con ${featuresCount} <em>features</em> accessorie presenti. ` +
+                    diagText = `Criteri istologici soddisfatti: ≥15 eos/HPF (${peakEos}) con pattern istologico tipico ` +
+                        `(${highSpecificityCount} features ad alta specificità, ${totalFeaturesCount} totali). ` +
                         "La diagnosi è clinico-patologica: verificare presenza di sintomi di disfunzione esofagea ed escludere altre cause.";
                 } 
-                else if (exclusionsCount === 0 && featuresCount < 2) {
+                else if (exclusionsCount === 0 && totalFeaturesCount >= 1) {
                     diagnosis = "QUADRO COMPATIBILE CON EoE";
                     diagClass = "diagnosis-compatible";
-                    diagText = `Presente eosinofilia significativa (${peakEos} eos/HPF) ma con poche <em>features</em> accessorie. ` +
+                    diagText = `Presente eosinofilia significativa (${peakEos} eos/HPF) con alcune features suggestive. ` +
                         "Correlare con clinica ed endoscopia. Considerare risposta a terapia per conferma.";
+                }
+                else if (exclusionsCount === 0 && totalFeaturesCount === 0) {
+                    diagnosis = "EOSINOFILIA ESOFAGEA - PATTERN ATIPICO";
+                    diagClass = "diagnosis-compatible";
+                    diagText = `Eosinofilia significativa (${peakEos} eos/HPF) senza features accessorie tipiche. ` +
+                        "Quadro inusuale per EoE. Considerare GERD, campionamento inadeguato o forme atipiche.";
+                    differentials = ["GERD con eosinofilia", "Campionamento inadeguato", "EoE atipica"];
                 }
                 else {
                     diagnosis = "EOSINOFILIA ESOFAGEA - DIAGNOSI DIFFERENZIALE NECESSARIA";
                     diagClass = "diagnosis-compatible";
-                    diagText = `Eosinofilia significativa (${peakEos} eos/HPF) ma con elementi atipici. ` +
+                    diagText = `Eosinofilia significativa (${peakEos} eos/HPF) ma con elementi atipici per EoE pura. ` +
                         "Escludere altre cause prima di confermare EoE.";
                     
-                    if (exclusions.erosion) differentials.push("GERD erosiva");
-                    if (exclusions.neutrophils) differentials.push("Esofagite acuta/infettiva");
-                    if (exclusions.gastricEos) differentials.push("Gastroenterite eosinofila (EGE)");
+                    if (exclusions.erosion) differentials.push("GERD erosiva o esofagite da farmaci");
+                    if (exclusions.neutrophils) differentials.push("Esofagite acuta/componente infettiva (salvo post-impaction/dilatazione)");
+                    if (exclusions.gastricEos) differentials.push("Gastroenterite eosinofila (EGE/EGID)");
                 }
             }
             else if (peakEos >= 5 && peakEos < 15) {
@@ -1151,12 +1178,12 @@
                 diagnosis = "ASSENZA DI EOSINOFILIA SIGNIFICATIVA";
                 diagClass = "diagnosis-excluded";
                 diagText = `Conta eosinofila normale/minima (${peakEos} eos/HPF). Non soddisfatti criteri per EoE. ` +
-                    "Se clinica suggestiva, considerare: (1) EoE in remissione, (2) Campionamento inadeguato, (3) Effetto terapia in corso.";
+                    "Se clinica suggestiva, considerare: (1) EoE in remissione completa, (2) Campionamento inadeguato, (3) Effetto terapia in corso.";
             }
             
             // Nota sulla distribuzione
             if (distribution === 'distal' && peakEos >= 15) {
-                differentials.push("Pattern esclusivamente distale: considerare componente GERD");
+                differentials.push("⚠️ Pattern prevalentemente distale: valutare attentamente componente GERD");
             }
             
             // Aggiorna UI
@@ -1176,9 +1203,9 @@
             featuresList.innerHTML = '';
             
             const featureNames = {
-                microabscesses: 'Microascessi eosinofili',
-                degranulation: 'Degranulazione eosinofila',
-                surfaceLayering: 'Eosinofili superficiali',
+                microabscesses: 'Microascessi eosinofili ★',
+                degranulation: 'Degranulazione eosinofila ★',
+                surfaceLayering: 'Eosinofili superficiali ★',
                 spongiosis: 'Spongiosi (DIS)',
                 bzh: 'Iperplasia zona basale',
                 papillae: 'Allungamento papille',
@@ -1192,6 +1219,14 @@
                 li.innerHTML = `${features[key] ? '✓' : '○'} ${name}`;
                 featuresList.appendChild(li);
             }
+            
+            // Aggiungi nota sulle features ad alta specificità
+            const noteHigh = document.createElement('li');
+            noteHigh.style.marginTop = '10px';
+            noteHigh.style.fontSize = '0.85em';
+            noteHigh.style.color = '#718096';
+            noteHigh.innerHTML = '★ = features ad alta specificità per EoE';
+            featuresList.appendChild(noteHigh);
             
             // Differential diagnosis
             const diffBox = document.getElementById('differentialBox');
@@ -1233,17 +1268,10 @@
             }
             
             // Report text
-            generateReport(peakEos, levels, features, exclusions, distribution, diagnosis, featuresCount);
+            generateReport(peakEos, levels, features, exclusions, distribution, diagnosis, highSpecificityCount, totalFeaturesCount);
         }
         
-        function generateReport(peakEos, levels, features, exclusions, distribution, diagnosis, featuresCount) {
-            const distMap = {
-                proximal: 'prevalentemente prossimale',
-                distal: 'prevalentemente distale',
-                diffuse: 'diffusa (prossimale e distale)',
-                unknown: 'non valutabile per sede'
-            };
-            
+        function generateReport(peakEos, levels, features, exclusions, distribution, diagnosis, highSpecCount, totalCount) {
             // Costruisci stringa dettaglio livelli
             let levelsDetail = '';
             if (levels.length > 0) {
@@ -1264,15 +1292,16 @@
             let report = '';
             
             if (peakEos >= 15 && !exclusions.candida && !exclusions.viral && !exclusions.granulomas) {
-                report = `Mucosa esofagea con infiltrato infiammatorio a prevalente componente eosinofila. `;
-                report += `Conta eosinofila massima: ${peakEos} eosinofili/HPF ${levelsDetail}. `;
+                report = `Mucosa esofagea con infiltrato infiammatorio a prevalente componente eosinofila (peak: ${peakEos} eosinofili/HPF ${levelsDetail}). `;
                 
                 if (activeFeatures.length > 0) {
-                    report += `Si associano: ${activeFeatures.join(', ')}. `;
+                    report += `Si osservano: ${activeFeatures.join(', ')}. `;
+                } else {
+                    report += `Non si osservano features accessorie tipiche. `;
                 }
                 
                 if (exclusions.erosion || exclusions.neutrophils) {
-                    report += `Nota: presenti anche elementi atipici (`;
+                    report += `⚠️ Presenti elementi atipici (`;
                     let atypical = [];
                     if (exclusions.erosion) atypical.push('erosioni');
                     if (exclusions.neutrophils) atypical.push('neutrofili');
@@ -1280,20 +1309,23 @@
                 }
                 
                 report += `\n\nCONCLUSIONE: `;
-                if (featuresCount >= 2 && !exclusions.erosion && !exclusions.neutrophils) {
+                if (highSpecCount >= 2 || (totalCount >= 3 && !exclusions.erosion && !exclusions.neutrophils)) {
                     report += `Quadro istologico compatibile con ESOFAGITE EOSINOFILA. `;
-                    report += `Correlare con dati clinico-endoscopici per conferma diagnostica.`;
+                    report += `In assenza di adeguata correlazione clinica-endoscopica (sintomi di disfunzione esofagea, aspetto endoscopico), `;
+                    report += `la diagnosi di EoE non può essere posta su base istologica isolata.`;
+                } else if (totalCount >= 1) {
+                    report += `Eosinofilia esofagea significativa con alcune features suggestive per EoE. `;
+                    report += `Si raccomanda correlazione clinico-endoscopica per conferma diagnostica.`;
                 } else {
-                    report += `Eosinofilia esofagea significativa. Quadro compatibile con esofagite eosinofila, `;
-                    report += `tuttavia si raccomanda correlazione clinico-endoscopica ed esclusione di altre cause di eosinofilia esofagea.`;
+                    report += `Eosinofilia esofagea senza pattern tipico. Considerare GERD, campionamento inadeguato o forme atipiche.`;
                 }
             } 
             else if (peakEos >= 5 && peakEos < 15) {
-                report = `Mucosa esofagea con modesta eosinofilia intraepiteliale (picco: ${peakEos} eosinofili/HPF) ${levelsDetail}. `;
+                report = `Mucosa esofagea con modesta eosinofilia intraepiteliale (picco: ${peakEos} eosinofili/HPF ${levelsDetail}). `;
                 if (activeFeatures.length > 0) {
                     report += `Si osservano: ${activeFeatures.join(', ')}. `;
                 }
-                report += `\n\nCONCLUSIONE: Eosinofilia esofagea sotto soglia diagnostica per esofagite eosinofila (cut-off ≥15 eos/HPF). `;
+                report += `\n\nCONCLUSIONE: Eosinofilia esofagea sotto soglia diagnostica per EoE (cut-off ≥15 eos/HPF). `;
                 report += `Possibile GERD con eosinofilia reattiva o EoE in remissione parziale. Correlare con clinica.`;
             }
             else if (exclusions.candida || exclusions.viral) {
@@ -1302,8 +1334,12 @@
                 if (exclusions.viral) report += `Presenti inclusioni virali. `;
                 report += `L'eosinofilia eventualmente presente è da considerarsi secondaria.`;
             }
+            else if (exclusions.granulomas) {
+                report = `Mucosa esofagea con granulomi non necrotizzanti ed eosinofilia (${peakEos} eos/HPF). `;
+                report += `\n\nCONCLUSIONE: Escludere malattia di Crohn esofagea. L'eosinofilia può essere secondaria.`;
+            }
             else {
-                report = `Mucosa esofagea con minima/assente componente eosinofila (${peakEos} eosinofili/HPF). `;
+                report = `Mucosa esofagea con assenza/minima componente eosinofila (${peakEos} eosinofili/HPF). `;
                 report += `Non soddisfatti criteri istologici per esofagite eosinofila.`;
             }
             
