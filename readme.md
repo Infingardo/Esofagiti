@@ -199,8 +199,9 @@ La diagnosi di EoE richiede **tutti e tre**:
 - Browser moderno (Chrome, Firefox, Safari, Edge)
 - JavaScript abilitato
 - Nessuna dipendenza esterna
-- File HTML autosufficiente (~32 KB)
+- File HTML autosufficiente (~34 KB)
 - Funziona offline
+- **Ottimizzato per mobile**: responsive design con touch targets appropriati (≥24px)
 
 ---
 
@@ -263,6 +264,7 @@ La diagnosi di EoE richiede **tutti e tre**:
 - **Reminder correlazione clinica**: aggiunto nel referto quando proposta EoE
 - **Testi migliorati**: erosioni/neutrofili da "esclusione" a "inusuali/red flag"
 - **UI refinements**: features list con indicatori specificità, titoli corretti
+- **Mobile-friendly**: media queries complete per uso su smartphone/tablet (touch targets 24px, layout responsive, tab verticali)
 
 ### v1.0 (Dicembre 2025)
 - Release iniziale
