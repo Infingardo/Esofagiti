@@ -1,315 +1,291 @@
-# Algoritmo Diagnostico Istologico per Esofagite Eosinofila (EoE)
+# Algoritmo Diagnostico Istologico — Esofagite Eosinofila (EoE)
+
+**Versione:** 2.2  
+**Data:** Marzo 2026  
+**Riferimenti normativi:** ACG Clinical Guideline 2025 · ESPGHAN 2024 · AGREE 2018 · Collins EoE-HSS 2017  
+**Autore:** Dr. Filippo Bianchi — SC Anatomia Patologica, ASST FBF-Sacco, Milano  
+**Generato con:** Claude AI (Anthropic) come strumento di supporto decisionale
+
+---
 
 ## Descrizione
 
-Tool HTML interattivo per supportare il patologo nella diagnosi istologica di esofagite eosinofila, basato sulle linee guida ACG 2025, ESPGHAN 2024 e sul sistema di scoring EoE-HSS di Collins.
+Tool HTML interattivo, autonomo, senza dipendenze esterne, per supportare il patologo nella diagnosi istologica di esofagite eosinofila. Non sostituisce il giudizio clinico-patologico: genera una **proposta diagnostica strutturata** da contestualizzare nel caso specifico.
 
-**Versione:** 1.1  
-**Data:** Gennaio 2026  
-**Autore:** Generato con Claude AI per uso clinico
+Filosofia di base: la diagnosi di EoE non è una cifra, è un pattern istologico contestuale. Il tool è progettato per ragionare bene sia nei casi puliti sia nei casi sporchi — quelli che fanno sudare il camice.
 
 ---
 
 ## Funzionalità
 
-### Input diagnostici (5 step)
+### Input diagnostici (6 step)
 
-1. **Peak Eosinophil Count (PEC)**
-   - Conta massima eosinofili/HPF per ciascun livello esofageo
-   - Cut-off diagnostico: ≥15 eos/HPF
-   - Campo teorico standard: 0.24 mm² (⚠️ varia tra 0.20-0.30 mm² secondo microscopio utilizzato)
+**Step 0 — Adeguatezza del campione**
+- Numero di biopsie pervenute (warning se <6)
+- Contenitori separati per livello (se no: topografia disabilitata e degradata a *non valutabile* in tutto il flusso)
+- Presenza di lamina propria (se no: LPF auto-impostato a N/A nell'HSS)
+- Controllo automatico su numero di livelli campionati (warning se <2)
 
-2. **Features istologiche accessorie**
-   - **Ad alta specificità (★):**
-     - Microascessi eosinofili (≥4 eos in cluster)
-     - Degranulazione eosinofila (granuli extracellulari visibili)
-     - Eosinofili superficiali/intraluminali
-   - **Supportive:**
-     - Spongiosi (dilated intercellular spaces - DIS)
-     - Iperplasia zona basale (>15-20% spessore epiteliale)
-     - Allungamento papille (>2/3 dell'epitelio)
-     - Fibrosi lamina propria (se campionata)
-     - Alterazioni epiteliali superficiali (SEA/DEC)
+**Step 1 — Conta eosinofili per livello**
+- Inserimento per livello: prossimale, medio, distale
+- Calcolo automatico del peak eosinophil count con sede(i) del picco
+- Conversione automatica in eos/mm² con area HPF inserita dall'utente
+- Calcolo soglia equivalente: `15 eos/HPF → X eos/mm²` per l'area in uso
+- Riferimento standardizzato: 0.27 mm² (trial CEGIR, ESPGHAN 2024) — nessun default fisso imposto
 
-3. **Elementi di esclusione/diagnosi alternativa**
-   - Erosioni/ulcerazioni → GERD, farmaci (inusuali in EoE pura)
-   - Neutrofili prominenti → esofagite acuta/infettiva (salvo post-procedura)
-   - Ife fungine (Candida) → esofagite infettiva
-   - Inclusioni virali (HSV, CMV) → esofagite virale
-   - Granulomi → Crohn esofageo
-   - Eosinofilia gastrica/duodenale → EGE/EGID
+**Step 2 — Features istologiche accessorie**
 
-4. **Distribuzione dell'eosinofilia**
-   - Prossimale/medio
-   - Distale (⚠️ alert per possibile componente GERD)
-   - Diffusa
-   - Non valutabile
+| Feature | Categoria |
+|---------|-----------|
+| Microascessi eosinofili (cluster ≥4) | ★ Alta specificità |
+| Degranulazione eosinofila | ★ Alta specificità |
+| Eosinofili superficiali/intraluminali | ★ Alta specificità |
+| Spongiosi (DIS) | Supportiva |
+| Iperplasia zona basale (>15–20%) | Supportiva |
+| Allungamento papille (>2/3) | Supportiva |
+| Fibrosi lamina propria | Supportiva |
+| Alterazioni epiteliali superficiali (SEA/DEC) | Supportiva |
 
-5. **EoE-HSS (Collins) - Opzionale**
-   - Grade (severità): 8 parametri, scala 0-3
-   - Stage (estensione): 8 parametri, scala 0-3
-   - Score massimo: 24/24 per grade e stage
-   - Utile per follow-up e trial clinici, non necessario per diagnosi di routine
+**Step 3 — Red flags e contesto differenziale**
 
-### Output
+Tre livelli distinti — nessuna esclusione automatica:
 
-- **Proposta diagnostica categoriale:**
-  - Esofagite Eosinofila (pattern istologico compatibile)
-  - Quadro compatibile con EoE (correlare con clinica)
-  - Eosinofilia esofagea sotto soglia
-  - Diagnosi alternativa (infezione, Crohn, ecc.)
+- **⛔ Red flags forti** (quadro non interpretabile come EoE primaria senza rivalutazione): ife fungine (Candida), inclusioni virali (HSV/CMV), granulomi non-necrotizzanti
+- **⚠️ Elementi atipici** (alert, non esclusione): erosioni/ulcerazioni, neutrofili prominenti
+- **🔶 Coinvolgimento extraesofageo**: eosinofilia gastrica/duodenale — segnalato come possibile EGID concomitante, non esclude EoE (ESPGHAN 2024)
 
-- **Riepilogo features** presenti/assenti con indicatori di specificità (★)
+**Step 4 — Distribuzione topografica**
+- Calcolata automaticamente dai dati dello Step 1 (badge AUTO)
+- Richiede ≥2 livelli campionati; con un solo livello → *non determinabile*
+- Override manuale stabile: una volta modificato manualmente, non viene più sovrascritto dagli aggiornamenti automatici
+- Se contenitore unico: radio disabilitati, distribuzione forzata a *non valutabile*; al ripristino di contenitori separati, il calcolo auto si riattiva
 
-- **Diagnosi differenziale** quando indicata
+**Step 5 — EoE Histologic Scoring System (Collins) — Facoltativo**
+- 8 parametri valutati per Grade (severità, 0–3) e Stage (estensione, 0–3)
+- LPF con opzione N/A (lamina propria non campionata); denominatore ridotto a 21 nel calcolo normalizzato
+- Controllo di coerenza tra peak eos e EI grade:
 
-- **EoE-HSS score** (se compilato) con criteri di remissione
+| Peak eos/HPF | EI Grade atteso |
+|-------------|----------------|
+| 0 | 0 |
+| 1–14 | 1 |
+| 15–60 | 2 |
+| >60 | 3 |
 
-- **Suggerimento referto** pronto per copia-incolla, con reminder esplicito sulla necessità di correlazione clinica
+- Warning aggiornato in tempo reale sia al cambio dei select HSS sia alla modifica dei counts eosinofili
 
 ---
 
-## Logica diagnostica implementata
+## Logica diagnostica
+
+### Unica fonte di verità
+
+Il tool implementa una separazione netta tra:
+
+1. **`buildDiagnosisResult()`** — calcola l'oggetto diagnostico (label, cssClass, testo, differenziali, red flags, nota EGID)
+2. **UI** — mostra il diagnosis box derivando da quell'oggetto
+3. **`buildReportText()`** — genera il referto derivando **dallo stesso oggetto** senza ricalcoli
+
+Questa architettura elimina la discordanza strutturale presente nelle versioni precedenti (diagnosis box e referto con logiche indipendenti).
+
+### Red flags come layer separato
+
+I red flags (infezione, granulomi) non sovrascrivono la diagnosi principale. Appaiono come:
+- Banner rosso sopra il diagnosis box
+- Addendum al referto (`redFlagReportAddendum`) — dopo la conclusione, non al posto di essa
+
+Un caso con peak 40 eos/HPF + microascessi + Candida produce:
+- Diagnosis box: **ESOFAGITE EOSINOFILA** (sfondo arancione per red flag attivi)
+- Referto: conclusione EoE + addendum red flag Candida
+
+### Flowchart diagnostica
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    BIOPSIA ESOFAGEA                         │
-└─────────────────────────────────────────────────────────────┘
-                            │
-                            ▼
-              ┌─────────────────────────┐
-              │  Infezione (Candida,    │───YES──→ ESOFAGITE INFETTIVA
-              │  HSV, CMV)?             │          Esclude EoE primaria
-              └─────────────────────────┘
-                            │ NO
-                            ▼
-              ┌─────────────────────────┐
-              │  Granulomi presenti?    │───YES──→ CONSIDERARE CROHN
-              └─────────────────────────┘          ESOFAGEO
-                            │ NO
-                            ▼
-              ┌─────────────────────────┐
-              │  Peak eos ≥15/HPF?      │───NO───→ SOTTO SOGLIA
-              └─────────────────────────┘          (GERD? Remissione?)
-                            │ YES
-                            ▼
-              ┌─────────────────────────┐
-              │  Erosioni o neutrofili? │───YES──→ EOSINOFILIA CON
-              └─────────────────────────┘          ELEMENTI ATIPICI
-                            │ NO                   (DD necessaria)
-                            ▼
-              ┌─────────────────────────┐
-              │ ≥2 features alta spec.  │───NO───→ COMPATIBILE CON EoE
-              │    OR ≥3 features tot.? │          (correlare con clinica)
-              └─────────────────────────┘
-                            │ YES
-                            ▼
-              ┌─────────────────────────┐
-              │     ESOFAGITE           │
-              │     EOSINOFILA          │
-              │  (quadro istologico     │
-              │     compatibile)        │
-              └─────────────────────────┘
+BIOPSIA ESOFAGEA
+│
+├─ [Step 0] Adeguatezza: N biopsie, livelli campionati, contenitore, LP
+│
+├─ [Step 1] Peak eos/HPF
+│   ├─ <5       → Assenza eosinofilia significativa
+│   ├─ 5–14     → Eosinofilia lieve, sotto soglia
+│   └─ ≥15      → continua ↓
+│
+├─ [Step 3] Red flags?
+│   ├─ Candida/viral/granulomi → banner red flag (non esclusione)
+│   └─ Erosioni/neutrofili → elementi atipici (alert)
+│
+├─ [Step 2] Features accessorie
+│   ├─ ≥2 alta specificità OR ≥3 totali (senza atipici) → ESOFAGITE EOSINOFILA
+│   ├─ ≥1 feature (senza atipici)                       → COMPATIBILE CON EoE
+│   ├─ 0 features (senza atipici)                       → PATTERN ATIPICO
+│   └─ qualsiasi + elementi atipici                     → DD NECESSARIA
+│
+└─ [Step 4] Distribuzione → alert se solo distale (GERD)
 ```
 
-### Novità v1.1: Valutazione qualitativa features
+---
 
-Invece di un conteggio rigido (≥2 features), il tool ora utilizza una **valutazione qualitativa**:
+## Output
 
-- **Features ad alta specificità (★)**: microascessi, degranulazione, eosinofili superficiali
-  - Presenza di ≥2 di queste → forte supporto diagnostico
-  
-- **Features supportive**: spongiosi, BZH, papille, fibrosi, alterazioni epiteliali
-  - Contribuiscono al pattern complessivo
+### Proposta diagnostica
+Quattro categorie con codice colore:
+- 🟢 **ESOFAGITE EOSINOFILA** — criteri istologici soddisfatti
+- 🟡 **QUADRO COMPATIBILE / PATTERN ATIPICO / DD NECESSARIA** — vari gradi di incertezza
+- ⬜ **EOSINOFILIA LIEVE** — sotto soglia
+- 🔴 **ASSENZA EOSINOFILIA** — criteri non soddisfatti
 
-**Criteri decisionali:**
-- Alta specificità ≥2 **OPPURE** features totali ≥3 (senza elementi atipici) → EoE confermata
-- Features totali ≥1 → compatibile con EoE
-- Features totali = 0 → pattern atipico, considerare alternative
+### Suggerimento referto
+Struttura standard:
+```
+MATERIALE:
+  Biopsie pervenute: N — contenitori [separati/unico]
+  Lamina propria: [presente/non campionata/non specificata]
 
-Questo approccio riflette meglio la realtà diagnostica: alcune features "pesano" di più nella decisione.
+ISTOLOGIA:
+  [Descrizione morfologica calibrata sul livello di eosinofilia]
+  Peak eosinophil count: X eos/HPF [Y eos/mm² — area HPF Z mm² — soglia equiv.: W eos/mm²]
+  Distribuzione per sede: [prossimale: X; medio: Y; distale: Z] oppure [non attribuibile per livello]
+  Distribuzione topografica: [diffusa/prossimale/distale/non determinabile]
+  Lamina propria: [stato]
+  Features accessorie: [lista o "non rilevate"]
+  [Eventuali elementi atipici]
+
+CONCLUSIONE:
+  [Testo derivato dal label diagnostico]
+
+[⛔ RED FLAGS se presenti — come addendum, non override]
+[🔶 Nota EGID se presente]
+
+[Rif: Dellon ES et al. ACG 2025 · ...]
+```
 
 ---
 
-## Criteri diagnostici (ACG 2025)
+## Gestione casi complessi
 
-La diagnosi di EoE richiede **tutti e tre**:
+### Infezione + eosinofilia
+Il tool mostra EoE come diagnosi principale (se i criteri numerici e morfologici sono soddisfatti) e aggiunge il red flag Candida/virale come addendum. La conclusione del referto rimane EoE con avvertenza esplicita di rivalutazione.
 
-1. **Sintomi di disfunzione esofagea** (valutazione clinica)
-2. **≥15 eosinofili/HPF** su biopsia esofagea
-3. **Esclusione di altre cause** di eosinofilia esofagea
+### EGID concomitante
+L'eosinofilia gastrica/duodenale genera un banner separato (🔶) e una nota nel referto. Non modifica la diagnosi EoE. In accordo con ESPGHAN 2024: il coinvolgimento di altri segmenti GI non esclude EoE.
 
-### Note importanti
+### Contenitore unico
+- Distribuzione topografica: disabilitata e forzata a *non valutabile*
+- Referto: `levelsDetail = "non attribuibile per livello (materiale in contenitore unico)"`
+- `distText = "non determinabile (contenitore unico)"`
+- Counts numerici per sede ancora visibili nel riepilogo (sono dati reali), ma non attribuiti topograficamente
 
-- La **risposta a PPI non esclude più la diagnosi** (dal 2018, AGREE consensus)
-- La malattia è **patchy**: raccomandate ≥6 biopsie da ≥2 livelli esofagei
-- Il **conteggio eosinofilo da solo non è patognomonico**
-- Features accessorie aumentano la specificità diagnostica
-- **L'istologia da sola non basta**: necessaria correlazione clinica-endoscopica
+### Un solo livello campionato
+- Distribuzione auto: restituisce *non determinabile* con nota esplicita
+- Warning in Step 0
 
 ---
 
-## EoE Histologic Scoring System (Collins)
+## EoE-HSS — note tecniche
 
-### 8 Parametri valutati
+| Parametro | Abbreviazione | Grade (severità) | Stage (estensione) |
+|-----------|---------------|------------------|--------------------|
+| Eosinophil Inflammation | EI | 0–3 | 0–3 |
+| Basal Zone Hyperplasia | BZH | 0–3 | 0–3 |
+| Eosinophil Abscess | EA | 0–3 | 0–3 |
+| Eosinophil Surface Layering | ESL | 0–3 | 0–3 |
+| Dilated Intercellular Spaces | DIS | 0–3 | 0–3 |
+| Surface Epithelial Alteration | SEA | 0–3 | 0–3 |
+| Dyskeratotic Epithelial Cells | DEC | 0–3 | 0–3 |
+| Lamina Propria Fibrosis | LPF | 0–3 / **N/A** | 0–3 / **N/A** |
 
-| Parametro | Abbreviazione | Descrizione |
-|-----------|---------------|-------------|
-| Eosinophil Inflammation | EI | Densità eosinofili |
-| Basal Zone Hyperplasia | BZH | % spessore zona basale |
-| Eosinophil Abscess | EA | Cluster ≥4 eosinofili |
-| Eosinophil Surface Layering | ESL | Eosinofili in fila superficiale |
-| Dilated Intercellular Spaces | DIS | Spongiosi |
-| Surface Epithelial Alteration | SEA | Alterazioni superficie |
-| Dyskeratotic Epithelial Cells | DEC | Cellule discheratotiche |
-| Lamina Propria Fibrosis | LPF | Fibrosi (se campionata) |
+**Score massimo:** 24 se LP campionata, 21 se LPF = N/A  
+**Score normalizzato:** `gradeTotal / gradeMax` (denominatore adattato)
 
-### Scoring
-
-- **Grade (severità):** 0-3 per parametro (max 24)
-- **Stage (estensione):** 0-3 per parametro (max 24)
-- **Score normalizzato:** totale/24
-
-### Criteri di remissione istologica (EoEHRS)
-
+**Criteri di remissione istologica (EoEHRS):**
 - PEC <15 eos/HPF in tutti i siti
-- EI grade 0-1
-- EI stage 0
-- Total grade ≤3
-- Total stage ≤3
-
----
-
-## Diagnosi differenziale istologica
-
-| Condizione | Elementi distintivi |
-|------------|---------------------|
-| **GERD** | Eosinofilia solitamente <15/HPF, prevalenza distale, erosioni comuni, può coesistere |
-| **Esofagite infettiva** | Candida: ife/pseudoife. HSV: inclusioni Cowdry A. CMV: inclusioni citomegaliche |
-| **Crohn esofageo** | Granulomi non necrotizzanti, coinvolgimento altri tratti GI |
-| **Esofagite da farmaci** | Anamnesi farmacologica, necrosi epiteliale, "pill esophagitis" |
-| **Gastroenterite eosinofila** | Eosinofilia anche gastrica/duodenale |
-| **Acalasia** | Eosinofilia secondaria a stasi, quadro clinico-manometrico |
-| **Connettivopatie** | Contesto sistemico, vasculite |
+- EI grade 0–1, EI stage 0
+- Total grade ≤3, total stage ≤3
 
 ---
 
 ## Requisiti tecnici
 
-- Browser moderno (Chrome, Firefox, Safari, Edge)
-- JavaScript abilitato
-- Nessuna dipendenza esterna
-- File HTML autosufficiente (~34 KB)
+- Browser moderno con JavaScript abilitato
+- Nessuna dipendenza esterna, nessuna chiamata di rete
+- File HTML singolo, autonomo (~35 KB)
 - Funziona offline
-- **Ottimizzato per mobile**: responsive design con touch targets appropriati (≥24px)
+- Responsive: ottimizzato per desktop e mobile
 
 ---
 
-## Utilizzo
+## Limiti e disclaimer
 
-1. Aprire il file HTML nel browser
-2. **Step 1:** Inserire il peak eosinophil count per livello esofageo
-3. **Step 2:** Selezionare le features istologiche presenti
-4. **Step 3:** Indicare eventuali elementi di esclusione/diagnosi alternativa
-5. **Step 4:** Specificare la distribuzione dell'eosinofilia
-6. **Step 5 (opzionale):** Compilare l'EoE-HSS se necessario per follow-up
-7. Cliccare "**Genera Proposta Diagnostica**"
-8. Rivedere la proposta, validarla nel contesto clinico
-9. Copiare il referto suggerito se appropriato
+**⚠️ Questo tool è un supporto decisionale per il patologo. Non sostituisce la valutazione morfologica diretta né il giudizio clinico-patologico integrato.**
 
----
-
-## Limitazioni e disclaimer
-
-### ⚠️ IMPORTANTE
-
-- **Non sostituisce il giudizio clinico-patologico**
-- La diagnosi di EoE è **clinico-patologica** e richiede integrazione con:
-  - Sintomi di disfunzione esofagea
-  - Aspetto endoscopico
-  - Esclusione di altre cause
-- Il tool genera una **proposta diagnostica**, non una diagnosi definitiva
-- **L'istologia da sola non basta**: senza correlazione clinica-endoscopica, la diagnosi non può essere posta
-- Il conteggio degli eosinofili può variare secondo l'area HPF del microscopio utilizzato
-- La valutazione di alcune features (es. degranulazione) è operator-dependent
+Limiti specifici:
 - Non considera l'anamnesi farmacologica o alimentare del paziente
-- Non valuta la risposta a terapia (utile per diagnosi iniziale)
-
----
-
-## Bibliografia principale
-
-1. Dellon ES et al. *ACG Clinical Guideline: Diagnosis and Management of Eosinophilic Esophagitis.* Am J Gastroenterol 2025;120(1):31-59
-
-2. Amil-Dias J et al. *Diagnosis and management of eosinophilic esophagitis in children: An ESPGHAN update.* J Pediatr Gastroenterol Nutr 2024;79(1):1-44
-
-3. Collins MH et al. *Newly developed and validated eosinophilic esophagitis histology scoring system.* Dis Esophagus 2017;30(3):1-8
-
-4. Dellon ES et al. *Updated international consensus diagnostic criteria for eosinophilic esophagitis: AGREE Conference.* Gastroenterology 2018;155(4):1022-1033
-
-5. Collins MH et al. *Histopathology of Eosinophilic Esophagitis.* Immunol Allergy Clin North Am 2024;44(2):205-221
-
-(Bibliografia completa: vedi 17 riferimenti nel tool)
+- Non valuta la risposta terapeutica (solo diagnosi iniziale/follow-up strutturato)
+- La valutazione di alcune features (degranulazione, SEA) è operator-dependent
+- Non classifica automaticamente l'attività endoscopica (EREFS)
+- Non è validato per età pediatrica in modo specifico (i criteri istologici sono gli stessi)
 
 ---
 
 ## Changelog
 
-### v1.1 (Gennaio 2026)
-- **Logica features più flessibile**: valutazione qualitativa invece di conteggio rigido ≥2
-- **Features categorizzate**: alta specificità (★) vs supportive
-- **Disclaimer prominente**: spostato sopra il pulsante, enfasi su "proposta" vs "diagnosi"
-- **HPF area warning**: nota esplicita su variabilità 0.20-0.30 mm² tra microscopi
-- **Report più concisi**: eliminata verbosità quando diagnosi chiara
-- **Reminder correlazione clinica**: aggiunto nel referto quando proposta EoE
-- **Testi migliorati**: erosioni/neutrofili da "esclusione" a "inusuali/red flag"
-- **UI refinements**: features list con indicatori specificità, titoli corretti
-- **Mobile-friendly**: media queries complete per uso su smartphone/tablet (touch targets 24px, layout responsive, tab verticali)
+### v2.2 (Marzo 2026)
+- **HPF area:** rimosso 0.24 mm² come default; placeholder neutro; nota aggiornata con riferimento CEGIR 0.27 mm² (ESPGHAN 2024)
+- **Soglia equivalente:** `buildReportText()` calcola e mostra `15/hpfArea eos/mm²` nel referto
+- **Topografia con contenitore unico:** `levelsDetail` e `distText` nel referto ora usano testo esplicito "non attribuibile" invece dei counts per sede
+- **Rientro distribuzione auto:** quando si passa da contenitore unico a separati, `autoSetDistribution()` si riattiva automaticamente
+- **Coerenza HSS EI grade:** range 1–14 → grade atteso 1 (tolleranza rimossa per grade=0 con eos presenti)
+- **Wording referto sub-soglia:** "infiltrato a prevalente componente eosinofila" sostituito con "modesta eosinofilia intraepiteliale sotto soglia diagnostica"
 
-### v1.0 (Dicembre 2025)
-- Release iniziale
-- Implementazione criteri ACG 2025
-- EoE-HSS completo (grade + stage)
-- Generazione automatica referto
-- Bibliografia aggiornata (17 riferimenti)
+### v2.1 (Marzo 2026)
+- Unica fonte di verità: referto derivato da `buildDiagnosisResult()`, nessun ricalcolo parallelo
+- Distribuzione auto solo con ≥2 livelli campionati
+- `checkAdequacy()` controlla numero di livelli campionati
+- Contenitore unico: radio disabilitati + blocco distribuzione topografica
+- Scala coerenza HSS corretta (peak >60 → grade 3)
+- `checkHSSCoherence()` aggiornato al cambio degli input eos
+- Override distribuzione stabile con flag `distributionManuallyEdited`
+- Campo area HPF con conversione eos/mm² in tempo reale
 
----
+### v2.0 (Marzo 2026)
+- Red flags come layer separato (no esclusioni automatiche)
+- `gastricEos` spostato in sezione EGID extraesofageo
+- N/A per LPF nell'HSS
+- Controllo coerenza HSS vs peak eos
+- Step 0: adeguatezza campione
+- Distribuzione auto-calcolata (override manuale)
+- Referto strutturato con sezione MATERIALE
 
-## Filosofia del tool
+### v1.3 (Febbraio 2026)
+- Logica features qualitativa (★ alta specificità vs supportive)
+- Disclaimer prominente
 
-Questo non è un algoritmo deterministico ma una **grammatica diagnostica**: fornisce una struttura per organizzare il pensiero morfologico, non una formula per sostituirlo.
-
-Il messaggio che passa è chiaro:
-> **L'EoE non è una cifra, è un pattern istologico contestuale.**
-
-E questo è esattamente il messaggio giusto da dare in un'epoca di patologi sotto pressione e clinici algoritmici.
-
----
-
-## Note per uso didattico
-
-Il tool può essere utilizzato per:
-- Training specializzandi in anatomia patologica
-- Discussioni multidisciplinari (patologo-gastroenterologo)
-- Standardizzazione refertazione intra-laboratorio
-- Quality assurance diagnostica
-
-**Non dovrebbe** essere usato per:
-- Diagnosi automatica senza validazione del patologo
-- Casi complessi senza discussione con il team
-- Sostituzione della valutazione morfologica diretta
+### v1.0–1.1 (Dicembre 2025 – Gennaio 2026)
+- Release iniziale con criteri ACG 2025, EoE-HSS completo, generazione referto
 
 ---
 
-## Contatti e feedback
+## Bibliografia
 
-Per segnalazioni, suggerimenti o richieste di miglioramento:
+1. Dellon ES, Muir AB, Katzka DA, et al. *ACG Clinical Guideline: Diagnosis and Management of Eosinophilic Esophagitis.* Am J Gastroenterol 2025;120(1):31-59.
+2. Amil-Dias J, Oliva S, Papadopoulou A, et al. *Diagnosis and management of eosinophilic esophagitis in children: ESPGHAN EGID Working Group update.* J Pediatr Gastroenterol Nutr 2024;79(1):1-44.
+3. Dellon ES, Liacouras CA, Molina-Infante J, et al. *Updated international consensus diagnostic criteria for EoE: AGREE Conference.* Gastroenterology 2018;155(4):1022-1033.
+4. Dhar A, Haboubi HN, Attwood SE, et al. *BSG and BSPGHAN joint consensus guidelines on EoE.* Gut 2022;71(8):1459-1487.
+5. Collins MH, Martin LJ, Alexander ES, et al. *Newly developed and validated EoE histology scoring system.* Dis Esophagus 2017;30(3):1-8.
+6. Collins MH, Arva NC, Bernieh A, et al. *Histopathology of Eosinophilic Esophagitis.* Immunol Allergy Clin North Am 2024;44(2):205-221.
+7. Ma C, Jairath V, Feagan BG, et al. *Responsiveness of a Histologic Scoring System vs Peak Eosinophil Count in EoE.* Am J Gastroenterol 2022;117(2):264-271.
+8. Gonsalves N. *Eosinophilic gastrointestinal disorders.* Clin Rev Allergy Immunol 2019;57(2):272-285.
+
+---
+
+## Contatti
 
 **Dr. Filippo Bianchi**  
-Direttore SC Anatomia Patologica  
-ASST Fatebenefratelli-Sacco, Milano  
-Email: filippo.bianchi@asst-fbf-sacco.it
+Direttore f.f. SC Anatomia Patologica  
+ASST Fatebenefratelli-Sacco, Presidio FBF-Melloni-Territorio  
+Piazzale Principessa Clotilde 3 — 20121 Milano  
+✉ filippo.bianchi@asst-fbf-sacco.it
 
 ---
 
-**Disclaimer finale:** Questo strumento è un **supporto decisionale** per il patologo e non sostituisce la valutazione professionale. La diagnosi finale deve integrare dati clinici, endoscopici e istologici secondo le linee guida vigenti. L'autore non si assume responsabilità per decisioni cliniche basate esclusivamente su questo tool.
+*Questo strumento è un supporto decisionale per il patologo e non sostituisce la valutazione professionale. La diagnosi finale deve integrare dati clinici, endoscopici e istologici secondo le linee guida vigenti.*
