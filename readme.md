@@ -1,6 +1,6 @@
 # Algoritmo Diagnostico Istologico — Esofagite Eosinofila (EoE)
 
-**Versione:** 2.2  
+**Versione:** 2.3  
 **Data:** Marzo 2026  
 **Riferimenti normativi:** ACG Clinical Guideline 2025 · ESPGHAN 2024 · AGREE 2018 · Collins EoE-HSS 2017  
 **Autore:** Dr. Filippo Bianchi — SC Anatomia Patologica, ASST FBF-Sacco, Milano  
@@ -228,6 +228,13 @@ Limiti specifici:
 ---
 
 ## Changelog
+
+### v2.3 (Marzo 2026)
+- Versione corrente pubblicata (`index.html`, header interno "v2.3")
+- Rifinitura wording UI: Step 2 rinominato "Aspetti Istologici Peculiari"; nota su erosioni/neutrofili con eziologia post-procedura/dilatazione
+- Logica diagnostica invariata rispetto a v2.2 (`highSpec >= 2 || total >= 3`)
+
+> **Nota:** il 16/03/2026 un upload accidentale su GitHub (`118de16`) ha sovrascritto questa versione con un file della linea v1.x (header "Dicembre 2025"), regredendo red flags a esclusioni automatiche e rimuovendo Step 0, conversione eos/mm² e distribuzione auto. Ripristinata da `eb66d96`.
 
 ### v2.2 (Marzo 2026)
 - **HPF area:** rimosso 0.24 mm² come default; placeholder neutro; nota aggiornata con riferimento CEGIR 0.27 mm² (ESPGHAN 2024)
