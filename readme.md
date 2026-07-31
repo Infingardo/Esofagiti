@@ -1,7 +1,7 @@
 # Algoritmo Diagnostico Istologico — Esofagite Eosinofila (EoE)
 
-**Versione:** 2.3  
-**Data:** Marzo 2026  
+**Versione:** 2.4  
+**Data:** Luglio 2026  
 **Riferimenti normativi:** ACG Clinical Guideline 2025 · ESPGHAN 2024 · AGREE 2018 · Collins EoE-HSS 2017  
 **Autore:** Dr. Filippo Bianchi — SC Anatomia Patologica, ASST FBF-Sacco, Milano  
 **Generato con:** Claude AI (Anthropic) come strumento di supporto decisionale
@@ -228,6 +228,14 @@ Limiti specifici:
 ---
 
 ## Changelog
+
+### v2.4 (Luglio 2026)
+Fix da issue tracker basato su caso di validazione reale (eosinofilia intraepiteliale sotto soglia, distribuzione prossimale-medio-distale 12/9/9 eos/HPF):
+- **Issue #2 (Alta):** l'area HPF è ora obbligatoria per un referto finale; se mancante il referto non contiene più un placeholder irrisolto ma è prefissato da un banner esplicito "BOZZA INCOMPLETA" (testo, UI e pulsante di copia)
+- **Issue #4 (Media-Alta):** ogni referto generato termina ora con un'indicazione operativa esplicita (terapia/ri-biopsia per i quadri EoE; trial IPP con ri-biopsia a 8 settimane oppure correlazione clinica con storia allergica/dietetica per i quadri sotto soglia o atipici, condizionata al pattern topografico)
+- **Issue #3 (Media):** la distribuzione topografica per sede viene ora usata esplicitamente per pesare il differenziale GERD vs EoE (pattern uniforme o con picco prossimale segnalato come atipico per GERD; pattern con gradiente decrescente verso il prossimale segnalato come compatibile con entrambe le entità)
+- **Issue #5 (Media):** tradotta la terminologia inglese residua nel testo generato ("Peak eosinophil count" → "Conta eosinofila massima", "Peak:" → "Picco:", "Grade/Stage Score" → "Punteggio Grade/Stage", ecc.); "eos/HPF" mantenuto invariato come unità tecnica su richiesta esplicita, così come le sigle internazionali del sistema HSS (EI, BZH, EA, ESL, DIS, SEA, DEC, LPF, Grade, Stage) e CEGIR
+- **Issue #1 (Bassa):** rimossa la ripetizione involontaria del campo "Lamina propria" in ISTOLOGIA — il dato compare ora una sola volta, in MATERIALE
 
 ### v2.3 (Marzo 2026)
 - Versione corrente pubblicata (`index.html`, header interno "v2.3")
