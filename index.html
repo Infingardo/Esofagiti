@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Algoritmo Diagnostico EoE v2.3</title>
+    <title>Algoritmo Diagnostico EoE v2.4</title>
     <style>
         :root {
             --primary: #2c5282; --secondary: #4a5568; --accent: #3182ce;
@@ -148,7 +148,7 @@
 <div class="container">
     <header>
         <h1>🔬 Algoritmo Diagnostico Istologico — Esofagite Eosinofila</h1>
-        <p class="subtitle">ACG Guidelines 2025 · ESPGHAN 2024 · Collins EoE-HSS &nbsp;|&nbsp; <strong>v2.3</strong></p>
+        <p class="subtitle">ACG Guidelines 2025 · ESPGHAN 2024 · Collins EoE-HSS &nbsp;|&nbsp; <strong>v2.4</strong></p>
     </header>
 
     <!-- STEP 0: ADEGUATEZZA -->
@@ -210,7 +210,7 @@
         </div>
 
         <div class="peak-display">
-            <span class="peak-label">Peak eosinophil count:</span>
+            <span class="peak-label">Conta eosinofila massima:</span>
             <span class="peak-value" id="peakValue">—</span>
             <span class="peak-unit">eos/HPF</span>
             <span class="peak-location" id="peakLocation"></span>
@@ -218,7 +218,7 @@
 
         <!-- HPF area + conversione -->
         <div class="hpf-row" style="margin-bottom:10px;">
-            <label for="hpfArea">Area HPF microscopio:</label>
+            <label for="hpfArea">Area HPF microscopio <span style="color:#c53030;">*obbligatoria per il referto finale</span>:</label>
             <input type="number" id="hpfArea" min="0.10" max="0.50" step="0.01" placeholder="es. 0.27" oninput="updateDensity()">
             <span class="eos-unit">mm²</span>
             <span class="hpf-conversion" id="densityDisplay"></span>
@@ -417,11 +417,12 @@
                 <div id="differentialText"></div>
             </div>
             <div id="hssResult" style="display:none;">
-                <h4 style="margin-top:15px;color:var(--primary);">EoE-HSS Score</h4>
+                <h4 style="margin-top:15px;color:var(--primary);">Punteggio EoE-HSS</h4>
                 <div id="hssScores" class="hss-result-box"></div>
             </div>
             <div id="reportSection" style="display:none;">
                 <h4 style="margin-top:20px;color:var(--primary);">Suggerimento Referto</h4>
+                <div id="reportIncompleteBanner" class="error-note" style="display:none;"></div>
                 <div id="reportText" class="report-text"></div>
                 <div class="btn-row">
                     <button type="button" class="btn-copy" onclick="copyReport()">📋 Copia Referto</button>
@@ -439,7 +440,7 @@
         4. Collins MH et al. <em>Newly developed and validated EoE histology scoring system.</em> Dis Esophagus 2017;30(3):1-8.<br>
         5. Collins MH et al. <em>Histopathology of EoE.</em> Immunol Allergy Clin North Am 2024;44(2):205-221.<br>
         6. Ma C et al. <em>Responsiveness of a Histologic Scoring System vs Peak Eosinophil Count in EoE.</em> Am J Gastroenterol 2022;117(2):264-271.<br>
-        <em style="color:#718096;">Ultimo aggiornamento: Marzo 2026 (v2.3)</em>
+        <em style="color:#718096;">Ultimo aggiornamento: Luglio 2026 (v2.4)</em>
     </div>
 </div>
 
@@ -527,7 +528,7 @@ function updateDensity() {
     }
     const peak    = Math.max(...levels.map(l => l.value));
     const density = (peak / hpfArea).toFixed(1);
-    dispEl.textContent = `Peak: ${density} eos/mm² | Soglia equivalente: ${thresholdDensity} eos/mm²`;
+    dispEl.textContent = `Picco: ${density} eos/mm² | Soglia equivalente: ${thresholdDensity} eos/mm²`;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -636,15 +637,15 @@ function checkHSSCoherence() {
 
     // Coerenza EI grade vs peak eos — scala corretta
     if (peakEos === 0 && eiGrade > 0)
-        warnings.push(`EI grade ${eiGrade} incoerente con peak 0 eos/HPF.`);
+        warnings.push(`EI grade ${eiGrade} incoerente con picco 0 eos/HPF.`);
     else if (peakEos >= 1 && peakEos <= 14 && (eiGrade === 0 || eiGrade > 1))
-        warnings.push(`Peak ${peakEos} eos/HPF (1–14): EI grade atteso 1, impostato ${eiGrade}.`);
+        warnings.push(`Picco ${peakEos} eos/HPF (1–14): EI grade atteso 1, impostato ${eiGrade}.`);
     else if (peakEos >= 15 && peakEos <= 60 && eiGrade !== 2)
-        warnings.push(`Peak ${peakEos} eos/HPF (15–60): EI grade atteso 2, impostato ${eiGrade}.`);
+        warnings.push(`Picco ${peakEos} eos/HPF (15–60): EI grade atteso 2, impostato ${eiGrade}.`);
     else if (peakEos > 60 && eiGrade !== 3)   // FIX #5: era eiGrade < 2
-        warnings.push(`Peak ${peakEos} eos/HPF (>60): EI grade atteso 3, impostato ${eiGrade}.`);
+        warnings.push(`Picco ${peakEos} eos/HPF (>60): EI grade atteso 3, impostato ${eiGrade}.`);
     else if (peakEos >= 15 && eiGrade === 0)
-        warnings.push(`EI grade 0 incoerente con peak eos/HPF ≥15.`);
+        warnings.push(`EI grade 0 incoerente con picco eos/HPF ≥15.`);
 
     if (eiStage === 0 && eiGrade >= 2)
         warnings.push('EI stage 0% con EI grade elevato: verificare estensione del coinvolgimento eosinofilo.');
@@ -691,6 +692,43 @@ function buildHSSScore() {
     };
 }
 
+// FIX #3/#4: pattern topografico grezzo (indipendente dalla soglia diagnostica ≥15,
+// usato per pesare il differenziale GERD vs EoE e per l'indicazione operativa)
+function analyzeTopographyPattern(levels) {
+    if (levels.length < 2) return null;
+    const proxVal = levels.find(l => l.label === 'prossimale')?.value;
+    const midVal  = levels.find(l => l.label === 'medio')?.value;
+    const distVal = levels.find(l => l.label === 'distale')?.value;
+    const values   = levels.map(l => l.value);
+    const maxVal   = Math.max(...values);
+    const minVal   = Math.min(...values);
+    const spread   = maxVal - minVal;
+    const uniform  = spread <= Math.max(2, maxVal * 0.25);
+    const maxLevels = levels.filter(l => l.value === maxVal).map(l => l.label);
+
+    if (uniform)
+        return { type: 'uniform', atypicalForGerd: true, note: 'sostanzialmente uniforme tra i livelli campionati' };
+    if (maxLevels.includes('prossimale'))
+        return { type: 'proximalMax', atypicalForGerd: true, note: 'valore massimo in sede prossimale' };
+    if (maxLevels.includes('distale') && proxVal !== undefined && midVal !== undefined
+        && distVal >= midVal && midVal >= proxVal)
+        return { type: 'distalGradient', atypicalForGerd: false, note: 'valore massimo distale con gradiente decrescente verso il prossimale' };
+    return { type: 'mixed', atypicalForGerd: false, note: 'pattern topografico misto, senza gradiente netto' };
+}
+
+// FIX #3: usa il pattern topografico per pesare il differenziale GERD vs EoE
+// (solo per i quadri dove quel differenziale è in discussione: sotto soglia / atipico)
+function buildTopographyNote(d) {
+    if (!d.topography) return '';
+    if (!(d.label.includes('LIEVE') || d.label.includes('ATIPICO'))) return '';
+    const t = d.topography;
+    if (t.type === 'uniform' || t.type === 'proximalMax')
+        return `Distribuzione topografica (${t.note}): elemento atipico per GERD, che tipicamente concentra l'eosinofilia in sede distale; dato rilevante a favore di una possibile EoE (in remissione parziale o sotto soglia), da considerare nel ragionamento clinico complessivo.`;
+    if (t.type === 'distalGradient')
+        return `Distribuzione topografica (${t.note}): pattern compatibile con entrambe le entità, GERD inclusa.`;
+    return '';
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // CORE DIAGNOSTICA — unica fonte di verità
 // ─────────────────────────────────────────────────────────────────────────────
@@ -721,10 +759,12 @@ function buildDiagnosisResult(peakEos, levels, features, flags, distribution) {
         ? '\n\n⛔ NOTA RED FLAGS:\n' + redFlags.map(f => '  - ' + f).join('\n')
         : '';
 
+    const topography = analyzeTopographyPattern(levels);
+
     let res = {
         label: '', cssClass: '', text: '', differentials: [],
         redFlags, egidNote, redFlagReportAddendum,
-        highSpec, total, peakEos, levels, features, flags, distribution,
+        highSpec, total, peakEos, levels, features, flags, distribution, topography,
         isConditioned: redFlags.length > 0
     };
 
@@ -763,10 +803,39 @@ function buildDiagnosisResult(peakEos, levels, features, flags, distribution) {
         res.text     = `Conta eosinofila normale/minima (${peakEos} eos/HPF). Non soddisfatti criteri istologici per EoE.`;
     }
 
+    // FIX #3: pesa il differenziale GERD vs EoE con il pattern topografico grezzo
+    const topographyNote = buildTopographyNote(res);
+    if (topographyNote) {
+        res.text += '\n\n' + topographyNote;
+        res.differentials.push(topographyNote);
+    }
+
     if (distribution === 'distal' && peakEos >= 15) {
         res.differentials.push('⚠️ Pattern esclusivamente distale: valutare attentamente componente GERD');
     }
     return res;
+}
+
+// FIX #4: indicazione operativa esplicita a chiusura del referto, condizionata
+// dal quadro diagnostico e — per i quadri sotto soglia/atipici — dal pattern topografico
+function buildOperationalRecommendation(d) {
+    const atypicalForGerd = !!(d.topography && d.topography.atypicalForGerd);
+
+    if (d.label === 'ESOFAGITE EOSINOFILA') {
+        return 'Impostare terapia (dieta di eliminazione, steroidi topici deglutiti o IPP secondo il quadro clinico) e programmare biopsie di controllo a 8-12 settimane per la valutazione della risposta istologica.';
+    }
+    if (d.label === 'QUADRO COMPATIBILE CON EoE') {
+        return 'Si raccomanda correlazione clinico-endoscopica stretta; considerare trial terapeutico (IPP o dieta di eliminazione) con ri-biopsia di controllo per confermare il quadro.';
+    }
+    if (d.label.includes('ATIPICO') || d.label.includes('LIEVE')) {
+        return atypicalForGerd
+            ? 'Si raccomanda correlazione clinica più stretta con storia allergica/dietetica, dato il pattern topografico atipico per GERD (vedi sopra); considerare comunque trial terapeutico e ri-biopsia secondo il quadro clinico complessivo.'
+            : 'Si raccomanda trial empirico con inibitori di pompa protonica (IPP) per 8 settimane, con ri-biopsia di controllo al termine per la rivalutazione istologica.';
+    }
+    if (d.label.includes('DIFFERENZIALE')) {
+        return 'Si raccomanda approfondimento eziologico mirato (revisione farmacologica, caratterizzazione della componente infettiva/erosiva) prima di programmare biopsie di controllo.';
+    }
+    return 'Non sono richieste azioni specifiche in assenza di ulteriori elementi clinici; correlare comunque con il quadro sintomatologico ed endoscopico.';
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -807,6 +876,7 @@ function buildReportText(d) {
     if (d.features.dyskeratosis)    activeFeat.push('alterazioni epiteliali superficiali (SEA/DEC)');
 
     let r = '';
+    let hpfAreaMissing = false;
 
     // Intestazione materiale
     if (numBiopsies || contenitori !== 'unknown' || lp !== 'unknown') {
@@ -827,17 +897,17 @@ function buildReportText(d) {
             ? 'Mucosa esofagea con eosinofilia intraepiteliale significativa.'
             : 'Mucosa esofagea con modesta eosinofilia intraepiteliale sotto soglia diagnostica.';
         r += morfIntro + '\n';
-        r += `  Peak eosinophil count: ${d.peakEos} eos/HPF`;
+        r += `  Conta eosinofila massima: ${d.peakEos} eos/HPF`;
         if (hpfArea > 0) {
             const density   = (d.peakEos / hpfArea).toFixed(1);
             const threshold = (15 / hpfArea).toFixed(1);
             r += ` [${density} eos/mm² — area HPF ${hpfArea} mm² — soglia equiv.: ${threshold} eos/mm²]`;
         } else {
-            r += ` [area HPF non specificata — inserire per conversione in eos/mm²; rif. CEGIR: 0.27 mm²]`;
+            hpfAreaMissing = true;
+            r += ` — conversione in eos/mm² non eseguita: area HPF non inserita (dato obbligatorio per il referto finale; standard CEGIR: 0.27 mm²)`;
         }
         r += `\n  Distribuzione per sede: ${levelsDetail}\n`;
         r += `  Distribuzione topografica: ${distText}\n`;
-        r += `  Lamina propria: ${lpText}\n`;
         r += activeFeat.length
             ? `  Features accessorie: ${activeFeat.join(', ')}\n`
             : `  Features accessorie: non rilevate\n`;
@@ -847,7 +917,7 @@ function buildReportText(d) {
         if (atyp.length) r += `  ⚠️ Elementi atipici: ${atyp.join(', ')}\n`;
         if (d.egidNote) r += `  🔶 Coinvolgimento extraesofageo: segnalato\n`;
     } else {
-        r += `Mucosa esofagea senza eosinofilia intraepiteliale rilevante (${d.peakEos} eos/HPF). Lamina propria: ${lpText}.\n`;
+        r += `Mucosa esofagea senza eosinofilia intraepiteliale rilevante (${d.peakEos} eos/HPF).\n`;
     }
 
     // — CONCLUSIONE: deriva da diag.label
@@ -866,10 +936,21 @@ function buildReportText(d) {
         r += 'Non soddisfatti criteri istologici per esofagite eosinofila.';
     }
 
+    // FIX #3: stessa nota topografica usata in buildDiagnosisResult, nessun ricalcolo
+    const topographyNote = buildTopographyNote(d);
+    if (topographyNote) r += '\n' + topographyNote;
+
     if (d.redFlagReportAddendum) r += d.redFlagReportAddendum;
     if (d.egidNote) r += '\n\n🔶 Nota EGID: ' + d.egidNote;
 
+    // FIX #4: azione conclusiva esplicita, sempre presente
+    r += '\n\n➡️ INDICAZIONE OPERATIVA:\n' + buildOperationalRecommendation(d);
+
     r += '\n\n[Rif: Dellon ES et al. ACG 2025 · Amil-Dias J et al. ESPGHAN 2024 · Collins MH et al. Dis Esophagus 2017]';
+
+    if (hpfAreaMissing) {
+        r = '⚠️ BOZZA INCOMPLETA — dato mancante: area HPF (mm²). Il referto non è definitivo finché il campo non viene compilato (necessario per la conversione standardizzata in eos/mm², rif. CEGIR 0.27 mm²).\n\n' + r;
+    }
     return r;
 }
 
@@ -977,19 +1058,30 @@ function generateDiagnosis() {
         const hss = buildHSSScore();
         hssResult.style.display = 'block';
         document.getElementById('hssScores').innerHTML = `
-            <p><strong>Grade Score:</strong> ${hss.gradeTotal}/${hss.gradeMax} (norm: ${hss.gradeNorm})</p>
-            <p><strong>Stage Score:</strong> ${hss.stageTotal}/${hss.stageMax} (norm: ${hss.stageNorm})</p>
+            <p><strong>Punteggio Grade:</strong> ${hss.gradeTotal}/${hss.gradeMax} (norm: ${hss.gradeNorm})</p>
+            <p><strong>Punteggio Stage:</strong> ${hss.stageTotal}/${hss.stageMax} (norm: ${hss.stageNorm})</p>
             ${hss.lpfNA ? '<p style="font-size:.85em;color:#d69e2e;margin-top:6px;">⚠️ LPF escluso (N/A — LP non campionata). Denominatore ridotto a 21.</p>' : ''}
             <p style="font-size:.85em;color:#718096;margin-top:8px;">
-                Remissione istologica (EoEHRS): EI grade 0–1, EI stage 0, total grade ≤3, total stage ≤3
+                Remissione istologica (EoEHRS): EI grade 0–1, EI stage 0, grade totale ≤3, stage totale ≤3
             </p>`;
     } else {
         hssResult.style.display = 'none';
     }
 
     // — Referto: derivato da diag — FIX #1
-    document.getElementById('reportText').textContent = buildReportText(diag);
+    const reportTextVal = buildReportText(diag);
+    document.getElementById('reportText').textContent = reportTextVal;
     document.getElementById('reportSection').style.display = 'block';
+
+    // Issue #2: segnala referto incompleto se manca l'area HPF obbligatoria
+    const reportIncomplete = reportTextVal.startsWith('⚠️ BOZZA INCOMPLETA');
+    const incompleteBanner = document.getElementById('reportIncompleteBanner');
+    incompleteBanner.style.display = reportIncomplete ? 'block' : 'none';
+    if (reportIncomplete) {
+        incompleteBanner.textContent = '⚠️ Campo obbligatorio mancante: area HPF (mm²). Compilare il campo al punto 1 prima di considerare questo referto definitivo.';
+    }
+    const copyBtn = document.querySelector('.btn-copy');
+    if (copyBtn) copyBtn.textContent = reportIncomplete ? '📋 Copia Referto (BOZZA INCOMPLETA)' : '📋 Copia Referto';
 
     document.getElementById('result').classList.add('show');
     document.getElementById('result').scrollIntoView({ behavior:'smooth', block:'start' });
