@@ -218,7 +218,7 @@
 
         <!-- HPF area + conversione -->
         <div class="hpf-row" style="margin-bottom:10px;">
-            <label for="hpfArea">Area HPF microscopio:</label>
+            <label for="hpfArea">Area HPF microscopio <span style="color:#c53030;">*obbligatoria per il referto finale</span>:</label>
             <input type="number" id="hpfArea" min="0.10" max="0.50" step="0.01" placeholder="es. 0.27" oninput="updateDensity()">
             <span class="eos-unit">mm²</span>
             <span class="hpf-conversion" id="densityDisplay"></span>
@@ -422,6 +422,7 @@
             </div>
             <div id="reportSection" style="display:none;">
                 <h4 style="margin-top:20px;color:var(--primary);">Suggerimento Referto</h4>
+                <div id="reportIncompleteBanner" class="error-note" style="display:none;"></div>
                 <div id="reportText" class="report-text"></div>
                 <div class="btn-row">
                     <button type="button" class="btn-copy" onclick="copyReport()">📋 Copia Referto</button>
@@ -807,6 +808,7 @@ function buildReportText(d) {
     if (d.features.dyskeratosis)    activeFeat.push('alterazioni epiteliali superficiali (SEA/DEC)');
 
     let r = '';
+    let hpfAreaMissing = false;
 
     // Intestazione materiale
     if (numBiopsies || contenitori !== 'unknown' || lp !== 'unknown') {
@@ -833,7 +835,8 @@ function buildReportText(d) {
             const threshold = (15 / hpfArea).toFixed(1);
             r += ` [${density} eos/mm² — area HPF ${hpfArea} mm² — soglia equiv.: ${threshold} eos/mm²]`;
         } else {
-            r += ` [area HPF non specificata — inserire per conversione in eos/mm²; rif. CEGIR: 0.27 mm²]`;
+            hpfAreaMissing = true;
+            r += ` — conversione in eos/mm² non eseguita: area HPF non inserita (dato obbligatorio per il referto finale; standard CEGIR: 0.27 mm²)`;
         }
         r += `\n  Distribuzione per sede: ${levelsDetail}\n`;
         r += `  Distribuzione topografica: ${distText}\n`;
@@ -870,6 +873,10 @@ function buildReportText(d) {
     if (d.egidNote) r += '\n\n🔶 Nota EGID: ' + d.egidNote;
 
     r += '\n\n[Rif: Dellon ES et al. ACG 2025 · Amil-Dias J et al. ESPGHAN 2024 · Collins MH et al. Dis Esophagus 2017]';
+
+    if (hpfAreaMissing) {
+        r = '⚠️ BOZZA INCOMPLETA — dato mancante: area HPF (mm²). Il referto non è definitivo finché il campo non viene compilato (necessario per la conversione standardizzata in eos/mm², rif. CEGIR 0.27 mm²).\n\n' + r;
+    }
     return r;
 }
 
@@ -988,8 +995,19 @@ function generateDiagnosis() {
     }
 
     // — Referto: derivato da diag — FIX #1
-    document.getElementById('reportText').textContent = buildReportText(diag);
+    const reportTextVal = buildReportText(diag);
+    document.getElementById('reportText').textContent = reportTextVal;
     document.getElementById('reportSection').style.display = 'block';
+
+    // Issue #2: segnala referto incompleto se manca l'area HPF obbligatoria
+    const reportIncomplete = reportTextVal.startsWith('⚠️ BOZZA INCOMPLETA');
+    const incompleteBanner = document.getElementById('reportIncompleteBanner');
+    incompleteBanner.style.display = reportIncomplete ? 'block' : 'none';
+    if (reportIncomplete) {
+        incompleteBanner.textContent = '⚠️ Campo obbligatorio mancante: area HPF (mm²). Compilare il campo al punto 1 prima di considerare questo referto definitivo.';
+    }
+    const copyBtn = document.querySelector('.btn-copy');
+    if (copyBtn) copyBtn.textContent = reportIncomplete ? '📋 Copia Referto (BOZZA INCOMPLETA)' : '📋 Copia Referto';
 
     document.getElementById('result').classList.add('show');
     document.getElementById('result').scrollIntoView({ behavior:'smooth', block:'start' });
