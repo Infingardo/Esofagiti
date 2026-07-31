@@ -210,7 +210,7 @@
         </div>
 
         <div class="peak-display">
-            <span class="peak-label">Peak eosinophil count:</span>
+            <span class="peak-label">Conta eosinofila massima:</span>
             <span class="peak-value" id="peakValue">—</span>
             <span class="peak-unit">eos/HPF</span>
             <span class="peak-location" id="peakLocation"></span>
@@ -417,7 +417,7 @@
                 <div id="differentialText"></div>
             </div>
             <div id="hssResult" style="display:none;">
-                <h4 style="margin-top:15px;color:var(--primary);">EoE-HSS Score</h4>
+                <h4 style="margin-top:15px;color:var(--primary);">Punteggio EoE-HSS</h4>
                 <div id="hssScores" class="hss-result-box"></div>
             </div>
             <div id="reportSection" style="display:none;">
@@ -528,7 +528,7 @@ function updateDensity() {
     }
     const peak    = Math.max(...levels.map(l => l.value));
     const density = (peak / hpfArea).toFixed(1);
-    dispEl.textContent = `Peak: ${density} eos/mm² | Soglia equivalente: ${thresholdDensity} eos/mm²`;
+    dispEl.textContent = `Picco: ${density} eos/mm² | Soglia equivalente: ${thresholdDensity} eos/mm²`;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -637,15 +637,15 @@ function checkHSSCoherence() {
 
     // Coerenza EI grade vs peak eos — scala corretta
     if (peakEos === 0 && eiGrade > 0)
-        warnings.push(`EI grade ${eiGrade} incoerente con peak 0 eos/HPF.`);
+        warnings.push(`EI grade ${eiGrade} incoerente con picco 0 eos/HPF.`);
     else if (peakEos >= 1 && peakEos <= 14 && (eiGrade === 0 || eiGrade > 1))
-        warnings.push(`Peak ${peakEos} eos/HPF (1–14): EI grade atteso 1, impostato ${eiGrade}.`);
+        warnings.push(`Picco ${peakEos} eos/HPF (1–14): EI grade atteso 1, impostato ${eiGrade}.`);
     else if (peakEos >= 15 && peakEos <= 60 && eiGrade !== 2)
-        warnings.push(`Peak ${peakEos} eos/HPF (15–60): EI grade atteso 2, impostato ${eiGrade}.`);
+        warnings.push(`Picco ${peakEos} eos/HPF (15–60): EI grade atteso 2, impostato ${eiGrade}.`);
     else if (peakEos > 60 && eiGrade !== 3)   // FIX #5: era eiGrade < 2
-        warnings.push(`Peak ${peakEos} eos/HPF (>60): EI grade atteso 3, impostato ${eiGrade}.`);
+        warnings.push(`Picco ${peakEos} eos/HPF (>60): EI grade atteso 3, impostato ${eiGrade}.`);
     else if (peakEos >= 15 && eiGrade === 0)
-        warnings.push(`EI grade 0 incoerente con peak eos/HPF ≥15.`);
+        warnings.push(`EI grade 0 incoerente con picco eos/HPF ≥15.`);
 
     if (eiStage === 0 && eiGrade >= 2)
         warnings.push('EI stage 0% con EI grade elevato: verificare estensione del coinvolgimento eosinofilo.');
@@ -897,7 +897,7 @@ function buildReportText(d) {
             ? 'Mucosa esofagea con eosinofilia intraepiteliale significativa.'
             : 'Mucosa esofagea con modesta eosinofilia intraepiteliale sotto soglia diagnostica.';
         r += morfIntro + '\n';
-        r += `  Peak eosinophil count: ${d.peakEos} eos/HPF`;
+        r += `  Conta eosinofila massima: ${d.peakEos} eos/HPF`;
         if (hpfArea > 0) {
             const density   = (d.peakEos / hpfArea).toFixed(1);
             const threshold = (15 / hpfArea).toFixed(1);
@@ -1059,11 +1059,11 @@ function generateDiagnosis() {
         const hss = buildHSSScore();
         hssResult.style.display = 'block';
         document.getElementById('hssScores').innerHTML = `
-            <p><strong>Grade Score:</strong> ${hss.gradeTotal}/${hss.gradeMax} (norm: ${hss.gradeNorm})</p>
-            <p><strong>Stage Score:</strong> ${hss.stageTotal}/${hss.stageMax} (norm: ${hss.stageNorm})</p>
+            <p><strong>Punteggio Grade:</strong> ${hss.gradeTotal}/${hss.gradeMax} (norm: ${hss.gradeNorm})</p>
+            <p><strong>Punteggio Stage:</strong> ${hss.stageTotal}/${hss.stageMax} (norm: ${hss.stageNorm})</p>
             ${hss.lpfNA ? '<p style="font-size:.85em;color:#d69e2e;margin-top:6px;">⚠️ LPF escluso (N/A — LP non campionata). Denominatore ridotto a 21.</p>' : ''}
             <p style="font-size:.85em;color:#718096;margin-top:8px;">
-                Remissione istologica (EoEHRS): EI grade 0–1, EI stage 0, total grade ≤3, total stage ≤3
+                Remissione istologica (EoEHRS): EI grade 0–1, EI stage 0, grade totale ≤3, stage totale ≤3
             </p>`;
     } else {
         hssResult.style.display = 'none';
