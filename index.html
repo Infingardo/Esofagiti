@@ -908,7 +908,6 @@ function buildReportText(d) {
         }
         r += `\n  Distribuzione per sede: ${levelsDetail}\n`;
         r += `  Distribuzione topografica: ${distText}\n`;
-        r += `  Lamina propria: ${lpText}\n`;
         r += activeFeat.length
             ? `  Features accessorie: ${activeFeat.join(', ')}\n`
             : `  Features accessorie: non rilevate\n`;
@@ -918,7 +917,7 @@ function buildReportText(d) {
         if (atyp.length) r += `  ⚠️ Elementi atipici: ${atyp.join(', ')}\n`;
         if (d.egidNote) r += `  🔶 Coinvolgimento extraesofageo: segnalato\n`;
     } else {
-        r += `Mucosa esofagea senza eosinofilia intraepiteliale rilevante (${d.peakEos} eos/HPF). Lamina propria: ${lpText}.\n`;
+        r += `Mucosa esofagea senza eosinofilia intraepiteliale rilevante (${d.peakEos} eos/HPF).\n`;
     }
 
     // — CONCLUSIONE: deriva da diag.label
