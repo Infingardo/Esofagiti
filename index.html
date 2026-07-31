@@ -716,6 +716,19 @@ function analyzeTopographyPattern(levels) {
     return { type: 'mixed', atypicalForGerd: false, note: 'pattern topografico misto, senza gradiente netto' };
 }
 
+// FIX #3: usa il pattern topografico per pesare il differenziale GERD vs EoE
+// (solo per i quadri dove quel differenziale è in discussione: sotto soglia / atipico)
+function buildTopographyNote(d) {
+    if (!d.topography) return '';
+    if (!(d.label.includes('LIEVE') || d.label.includes('ATIPICO'))) return '';
+    const t = d.topography;
+    if (t.type === 'uniform' || t.type === 'proximalMax')
+        return `Distribuzione topografica (${t.note}): elemento atipico per GERD, che tipicamente concentra l'eosinofilia in sede distale; dato rilevante a favore di una possibile EoE (in remissione parziale o sotto soglia), da considerare nel ragionamento clinico complessivo.`;
+    if (t.type === 'distalGradient')
+        return `Distribuzione topografica (${t.note}): pattern compatibile con entrambe le entità, GERD inclusa.`;
+    return '';
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // CORE DIAGNOSTICA — unica fonte di verità
 // ─────────────────────────────────────────────────────────────────────────────
@@ -788,6 +801,13 @@ function buildDiagnosisResult(peakEos, levels, features, flags, distribution) {
         res.label    = 'ASSENZA DI EOSINOFILIA SIGNIFICATIVA';
         res.cssClass = 'diagnosis-excluded';
         res.text     = `Conta eosinofila normale/minima (${peakEos} eos/HPF). Non soddisfatti criteri istologici per EoE.`;
+    }
+
+    // FIX #3: pesa il differenziale GERD vs EoE con il pattern topografico grezzo
+    const topographyNote = buildTopographyNote(res);
+    if (topographyNote) {
+        res.text += '\n\n' + topographyNote;
+        res.differentials.push(topographyNote);
     }
 
     if (distribution === 'distal' && peakEos >= 15) {
@@ -916,6 +936,10 @@ function buildReportText(d) {
     } else {
         r += 'Non soddisfatti criteri istologici per esofagite eosinofila.';
     }
+
+    // FIX #3: stessa nota topografica usata in buildDiagnosisResult, nessun ricalcolo
+    const topographyNote = buildTopographyNote(d);
+    if (topographyNote) r += '\n' + topographyNote;
 
     if (d.redFlagReportAddendum) r += d.redFlagReportAddendum;
     if (d.egidNote) r += '\n\n🔶 Nota EGID: ' + d.egidNote;
