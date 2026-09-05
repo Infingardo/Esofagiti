@@ -1,0 +1,9 @@
+{
+  "name": "eoe-diagnostic-tool",
+  "version": "2.5.0",
+  "private": true,
+  "description": "Algoritmo diagnostico per l'esofagite eosinofila (ACG 2025, Collins EoE-HSS)",
+  "scripts": {
+    "test": "node tests/run.mjs"
+  }
+}

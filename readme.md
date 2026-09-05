@@ -1,6 +1,6 @@
 # Algoritmo Diagnostico Istologico — Esofagite Eosinofila (EoE)
 
-**Versione:** 2.4  
+**Versione:** 2.5.0  
 **Data:** Luglio 2026  
 **Riferimenti normativi:** ACG Clinical Guideline 2025 · ESPGHAN 2024 · AGREE 2018 · Collins EoE-HSS 2017  
 **Autore:** Dr. Filippo Bianchi — SC Anatomia Patologica, ASST FBF-Sacco, Milano  
@@ -228,6 +228,19 @@ Limiti specifici:
 ---
 
 ## Changelog
+
+### v2.5.0 — *Il veto atipico degrada invece di cancellare; motore estratto e testato*
+
+Il motore diagnostico è stato estratto in **`engine.js`** (nessuna dipendenza dal DOM: riceve i valori già letti dal form) e coperto da una suite eseguibile con `npm test` — 79 asserzioni. `index.html` conserva i lettori del form come sottili wrapper.
+
+- **[FIX CRITICO] Erosione e neutrofili non annullano più un quadro EoE forte.** `hasAtypical` era un veto assoluto valutato prima di tutto: 200 eos/HPF con microascessi, degranulazione ed eosinofili superficiali uscivano come *"eosinofilia esofagea — diagnosi differenziale necessaria"* per la sola presenza di un'erosione. Ora un quadro forte riceve l'etichetta qualificata **"ESOFAGITE EOSINOFILA CON ELEMENTI ATIPICI"**, che chiede di spiegare gli elementi atipici senza cancellare quello eosinofilo; sui quadri deboli il veto resta pieno, dove serve. Nuova casella **"post-impatto alimentare / post-dilatazione"**: l'eccezione era già citata nel testo del differenziale (*"salvo post-impaction o post-dilatazione"*) ma non era dichiarabile da nessuna parte — dichiarandola, il veto non si applica.
+- **[FIX] Catena di coerenza HSS riscritta.** L'ultimo ramo (`peakEos >= 15 && eiGrade === 0`) era irraggiungibile — sempre intercettato dai due rami di intervallo — e le soglie erano ripetute in quattro punti. Ora c'è una sola `expectedEiGrade()`.
+- **[FIX] `checkAdequacy` segnala e basta.** Forzava LPF a N/A nel form e non lo ripristinava mai: rispondere *"lamina propria campionata: sì"* non aveva alcun effetto sull'HSS e il denominatore restava 21 su ogni caso. Lo stato dell'item lo gestisce ora `syncLpfAvailability()`, chiamata dallo stesso menu, nei due versi. Un test ancora i valori delle option così il refuso non può ripetersi.
+- **[FIX] La nota topografica compare una volta sola.** Veniva appesa al testo diagnostico **e** spinta dentro `differentials`, che l'interfaccia rende come elenco puntato: un paragrafo di 300 caratteri fra "GERD" e "EoE in remissione parziale".
+- **[FIX] Il gradiente distale si riconosce anche su due livelli.** Ne servivano tre: con solo medio e distale — il campionamento più comune — il pattern GERD tipico usciva come "misto" e non pesava sul differenziale né sull'indicazione operativa.
+- **[FIX] HSS abilitato ma non compilato** non stampa più `0/21` come se fosse un punteggio misurato: i menu partono da "0 – Assente" e senza almeno una modifica il referto lo dichiara.
+- **[NOTA] Scala EI dichiarata come locale.** Il grado 1 copre conte sotto la soglia diagnostica (1–14), mentre nell'EoEHSS di Collins il grado 0 copre l'intero intervallo <15; la riga sulla remissione istologica è coerente con la scala locale. Il commento nel codice lo dichiara: resta da decidere se allineare o formalizzare la deroga.
+
 
 ### v2.4 (Luglio 2026)
 Fix da issue tracker basato su caso di validazione reale (eosinofilia intraepiteliale sotto soglia, distribuzione prossimale-medio-distale 12/9/9 eos/HPF):
